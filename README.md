@@ -45,7 +45,7 @@
 - **More Sounds** - More sound effects and instrument sounds for the piano tab
 - **UI themes/improvements**
 
-> If you want to stay updated on new versions/updates or have some suggestions/feedback, consider joining the [Discord](discord.gg/XSXU7AaQjx )!
+> If you want to stay updated on new versions/updates or have some suggestions/feedback, consider joining the [Discord](https://discord.gg/XSXU7AaQjx)!
 
 ### Credits
 
