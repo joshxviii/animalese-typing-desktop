@@ -30,12 +30,42 @@
 <br/>
 
 ### 💿 Download:
-> You can download the latest release for **Windows** or **macOS** from [Releases](https://github.com/joshxviii/animalese-typing-desktop/releases/latest).
+> You can download the latest release for **Windows**, **macOS**, or **Linux** from [Releases](https://github.com/joshxviii/animalese-typing-desktop/releases/latest).
 
 ![DemoImage](https://github.com/user-attachments/assets/ccea8ea8-359c-4a2d-84d2-f9b3ebf97d29)
 
+<br/>
 
+### 🐧 Building on Linux
 
+**Prerequisites:**
+```sh
+sudo apt update
+sudo apt install git nodejs npm build-essential libxtst-dev libpng++-dev
+```
+
+**Build:**
+```sh
+git clone https://github.com/joshxviii/animalese-typing-desktop.git
+cd animalese-typing-desktop
+npm install
+npm run build  # Creates AppImage/deb in exports/ directory
+```
+
+**Run in dev mode:**
+```sh
+npm start
+```
+
+**Run the AppImage:**
+```sh
+chmod +x AnimaleseTypingSetup.AppImage
+./AnimaleseTypingSetup.AppImage --no-sandbox
+```
+
+> **Note:** The `--no-sandbox` flag is required due to Electron's sandboxing requirements on Linux.
+
+<br/>
 
 ### 📌 Planned Features:
 - **Get the app code signed/notarized** - This makes sure the app is recognized as trustworthy for smoother installation
@@ -51,4 +81,4 @@
 
 Developed by @joshxviii
 
-Contributors: @rokrokss @jiwooh
+Contributors: @rokrokss @jiwooh @lorite

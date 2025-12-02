@@ -73,8 +73,17 @@
         "AppImage",
         "deb"
       ],
+      "executableArgs": [
+        "--no-sandbox"
+      ],
       "category": "Utility",
       "icon": "assets/images/icon.png",
+      "extraResources": [
+        {
+          "from": "libs/key-listeners/linux-key-listener.cjs",
+          "to": "linux-key-listener.cjs"
+        }
+      ],
       "artifactName": "AnimaleseTypingSetup.${ext}"
     },
     "afterSign": "build/after-sign-hook.js"
