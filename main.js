@@ -4,8 +4,18 @@ import { fileURLToPath } from 'url';
 import Store from 'electron-store';
 import isDev from 'electron-is-dev';
 import { spawn } from 'child_process';
-import { activeWindow as getFocusedWindow } from '@deepfocus/get-windows';
 import pkg from 'electron-updater'; const { autoUpdater } = pkg;
+
+// Conditionally import get-windows (not supported on Linux)
+let getFocusedWindow = null;
+if (process.platform !== 'linux') {
+    try {
+        const getWindowsPkg = await import('@deepfocus/get-windows');
+        getFocusedWindow = getWindowsPkg.activeWindow;
+    } catch (error) {
+        console.warn('Window monitoring not available:', error.message);
+    }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -112,24 +122,31 @@ let focusedWindows = [];
 
 // check for active window changes and update `lastFocusedWindow` when the window changes
 async function monitorFocusedWindow() {
-    const focusedWindow = await getFocusedWindow();
-
-    if (!focusedWindow?.owner?.name) return;// return early if invlaid window
-
-    const winName = focusedWindow.owner.name
-    if (winName === lastFocusedWindow?.owner?.name) return;// return early if the active window hasn't changed.
+    // Skip window monitoring on Linux or if getFocusedWindow is not available
+    if (!getFocusedWindow) return;
     
-    const selectedApps = preferences.get('selected_apps');
+    try {
+        const focusedWindow = await getFocusedWindow();
 
-    // change disable value when focusing in or out of selecte-apps.
-    setDisable( (preferences.get('selected_active')?!selectedApps.includes(winName):selectedApps.includes(winName)) && 
-    (focusedWindow?.owner?.processId !== process.pid || winName === 'Animalese Typing') );
+        if (!focusedWindow?.owner?.name) return;// return early if invalid window
 
-    lastFocusedWindow = focusedWindow;
-    if (!focusedWindows.includes(winName)) {
-        focusedWindows.push(winName);
-        if (focusedWindows.length > 8) focusedWindows.shift();
-        bgwin.webContents.send('focused-window-changed', focusedWindows);
+        const winName = focusedWindow.owner.name
+        if (winName === lastFocusedWindow?.owner?.name) return;// return early if the active window hasn't changed.
+        
+        const selectedApps = preferences.get('selected_apps');
+
+        // change disable value when focusing in or out of selected-apps.
+        setDisable( (preferences.get('selected_active')?!selectedApps.includes(winName):selectedApps.includes(winName)) && 
+        (focusedWindow?.owner?.processId !== process.pid || winName === 'Animalese Typing') );
+
+        lastFocusedWindow = focusedWindow;
+        if (!focusedWindows.includes(winName)) {
+            focusedWindows.push(winName);
+            if (focusedWindows.length > 8) focusedWindows.shift();
+            bgwin.webContents.send('focused-window-changed', focusedWindows);
+        }
+    } catch (error) {
+        console.debug('Window monitoring error:', error.message);
     }
 }
 
@@ -283,7 +300,9 @@ async function startKeyListener() {
             ? path.join(__dirname, 'libs', 'key-listeners', 'swift-key-listener')
             : path.join(process.resourcesPath, 'swift-key-listener');
     } else if (platform === 'linux') {
-        //TODO: create linux key listener
+        listenerPath = isDev
+            ? path.join(__dirname, 'libs', 'key-listeners', 'linux-key-listener.cjs')
+            : path.join(process.resourcesPath, 'linux-key-listener.cjs');
     } else {
         console.error('Unsupported platform');
         return;
