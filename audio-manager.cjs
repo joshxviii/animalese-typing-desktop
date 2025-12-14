@@ -5,10 +5,10 @@ const { ipcRenderer } = require('electron');
 
 let master_volume = ipcRenderer.sendSync('get-store-data-sync').volume;
 ipcRenderer.on('updated-volume', (_, value) => master_volume = value);
-let v = ipcRenderer.sendSync('get-store-data-sync').voice_profile;
-ipcRenderer.on('updated-voice_profile', (_, value) => v = value);
-let instrument = ipcRenderer.sendSync('get-store-data-sync').instrument;
-ipcRenderer.on('updated-instrument', (_, value) => instrument = value);
+let voice_profile = ipcRenderer.sendSync('get-store-data-sync').voice_profile;
+ipcRenderer.on('updated-voice_profile', (_, value) => voice_profile = value);
+let note_profile = ipcRenderer.sendSync('get-store-data-sync').note_profile;
+ipcRenderer.on('updated-note_profile', (_, value) => note_profile = value);
 let mode = ipcRenderer.sendSync('get-store-data-sync').audio_mode;
 ipcRenderer.on('updated-audio_mode', (_, value) => mode = value);
 
@@ -195,17 +195,17 @@ function createAudioManager() {
         if (isInstrument) {
             const parsedNote = parseInt(path.replace('%.', ''));
             note = isNaN(parsedNote) ? note : parsedNote;
-            if ( mode===2 ) path = 'inst.guitar'
-            else  path = 'inst.'+instrument;
+            path = `inst.${note_profile.instrument}`;
+            pitchShift += note_profile.transpose;
         }
 
         if (isVoice) { // apply animalese voice profile
             volume = yelling? .75: .65;
-            pitchShift = (yelling? 1.5: 0) + v.pitch_shift;
-            pitchVariation = (yelling? 1: 0) + v.pitch_variation;
-            intonation = v.intonation;
+            pitchShift = (yelling? 1.5: 0) + voice_profile.shift;
+            pitchVariation = (yelling? 1: 0) + voice_profile.variation;
+            intonation = voice_profile.intonation;
             channel = channel ?? 1;
-            path = path.replace('&', v.voice_type);
+            path = path.replace('&', voice_profile.type);
         }
 
         const parts = path.split(".");

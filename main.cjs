@@ -59,12 +59,15 @@ const defaults = {
     selected_apps: [],
     selected_active: true,
     voice_profile: {
-        voice_type: 'f1',
-        pitch_shift: 0.0,
-        pitch_variation: 0.2,
+        type: 'f1',
+        shift: 0.0,
+        variation: 0.2,
         intonation: 0.0
     },
-    instrument: 'girl',
+    note_profile: {
+        instrument: 'girl',
+        transpose: 0,
+    },
     saved_voice_profiles: new Map(),
     remapped_keys: new Map()
 }

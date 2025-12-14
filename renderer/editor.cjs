@@ -1,6 +1,10 @@
 /**
  * author: joshxviii 
  */
+
+//TODO: whole code base needs major overhaul at some point.
+// It is slowly becoming hard to manage
+
 document.addEventListener('DOMContentLoaded', () => {
     initControls();
     updatedFocusedWindows();
@@ -23,11 +27,15 @@ document.getElementById('reset_settings').addEventListener('animationend', (e) =
 
 //#region Initialize controls and listeners
 const controls = [
-    'master_volume',
+    'master',
+    
     'voice_type',
-    'pitch_shift',
-    'pitch_variation',
-    'intonation'
+    'voice_pitch',
+    'voice_variation',
+    'voice_intonation',
+
+    'note_instrument',
+    'note_transpose'
 ];
 let voiceProfile = null;
 let voiceProfileSlots = null;
@@ -45,6 +53,7 @@ function initControls() {
     console.log("Initializing controls...");
     
     voiceProfile = preferences.get('voice_profile');
+    noteProfile = preferences.get('note_profile');
     voiceProfileSlots = preferences.get('saved_voice_profiles');
     profileName.value = voiceProfileSlots[parseInt(document.getElementById('voice_profile_slot').value)]?.name || ``;
     profileName.dispatchEvent(new Event('input', { bubbles: true }));
@@ -52,7 +61,7 @@ function initControls() {
 
     document.getElementById('lang_select').value = preferences.get('lang');
     checkStartupRun.checked = preferences.get('startup_run');
-    document.getElementById('inst_type').value = preferences.get('instrument');
+    document.getElementById('note_instrument').value = preferences.get('note_profile').instrument;
     document.getElementById('check_always_active').checked = preferences.get('always_active');
     document.getElementById('check_hold_repeat').checked = preferences.get('hold_repeat');
     document.querySelectorAll('#apps_table, #apps_toggle').forEach(el => el.setAttribute('disabled', preferences.get('always_active')));
@@ -89,10 +98,14 @@ function initControls() {
                 }
             } else el.value = value;
 
-            if (control==='master_volume') preferences.set('volume', value*.01);
-            else {
-                voiceProfile[control] = value;
+            if (control==='master') preferences.set('volume', value*.01);
+            else if (control.startsWith('voice')) {
+                voiceProfile[control.split('_')[1]] = value;
                 preferences.set('voice_profile', voiceProfile);
+            }
+            else if (control.startsWith('note')) {
+                noteProfile[control.split('_')[1]] = value;
+                preferences.set('note_profile', noteProfile);
             }
 
             if (updateSound && el.getAttribute('playing') !== 'true') {
@@ -112,17 +125,17 @@ function initControls() {
             outputEl = document.getElementById(control + '_out');
         }
         if (isSlider) {
-            updateValue(control === 'master_volume'?(preferences.get('volume') * 100):voiceProfile[control])
+            updateValue(control === 'master'?(preferences.get('volume') * 100):voiceProfile[control])
             
             const step = parseFloat((el.max - el.min) * 0.05);
             el.setAttribute('tabindex', '-1');
             
-            el.addEventListener('input', (e) => updateValue(e.target.value, control === 'master_volume'?'sfx.default':undefined));
+            el.addEventListener('input', (e) => updateValue(e.target.value, control === 'master'?'sfx.default':undefined));
             el.addEventListener('wheel', (e) => {
-                updateValue(parseFloat(el.value) + (e.deltaY < 0 ? step : -step), control === 'master_volume'?'sfx.default':undefined);
+                updateValue(parseFloat(el.value) + (e.deltaY < 0 ? step : -step), control === 'master'?'sfx.default':undefined);
             }, {passive: true});
             el.addEventListener('dblclick', () => updateValue(el.getAttribute('defaultValue')));
-            el.addEventListener('mouseup', () => updateValue(el.value, control === 'master_volume'?undefined:'&.ok'));
+            el.addEventListener('mouseup', () => updateValue(el.value, control.startsWith('voice')?'&.ok':undefined));
             if (outputEl) {
                 outputEl.addEventListener('click', () => outputEl.select());
                 outputEl.addEventListener('focusout', () => updateValue(outputEl.value));
@@ -134,18 +147,24 @@ function initControls() {
                 outputEl.addEventListener('dblclick', () => updateValue(el.getAttribute('defaultValue')));
             }
         } else {
-            el.value = voiceProfile[control];
-            el.addEventListener('input', (e) => updateValue(e.target.value, '&.ok'));
+            if (control.startsWith('voice')) {
+                el.value = voiceProfile[control.split('_')[1]];
+                el.addEventListener('input', (e) => updateValue(e.target.value, '&.ok'));
+            }
+            else if (control.startsWith('note')) {
+                el.value = noteProfile[control.split('_')[1]];
+                el.addEventListener('input', (e) => updateValue(e.target.value));
+            }
         }
     });
 
-    if (voiceProfile.voice_type) {
-        if(voiceProfile.voice_type.startsWith('m')) {
+    if (voiceProfile.type) {
+        if(voiceProfile.type.startsWith('m')) {
             document.getElementById('voice_type').className = 'male'
             document.getElementById('male').setAttribute('pressed', 'true');
             document.getElementById('female').setAttribute('pressed', 'false');
         }
-        else if(voiceProfile.voice_type.startsWith('f')) {
+        else if(voiceProfile.type.startsWith('f')) {
             document.getElementById('voice_type').className = 'female'
             document.getElementById('female').setAttribute('pressed', 'true');
             document.getElementById('male').setAttribute('pressed', 'false');
@@ -395,17 +414,11 @@ function changeTab(newTabIndex = 1) {
 //#region Remap controllers
 const specialLayout = [
     [
-        {label:'Nothing', btnType:'l', sound:`#no_sound`}
-    ],
-    [
-        {label:'Audio Toggle', btnType:'l', sound:`#1`}
-    ],
-    [
-        {label:'N/A', btnType:'l', sound:`#2`}
-    ],
-    [
+        {label:'Nothing', btnType:'l', sound:`#no_sound`},
+        {label:'Audio Toggle', btnType:'l', sound:`#1`},
+        {label:'Show Editor ', btnType:'l', sound:`#2`},
         {label:'N/A', btnType:'l', sound:`#3`}
-    ]
+    ],
 ]
 
 const voiceLayout = [

@@ -172,18 +172,18 @@ author: joshxviii
                 <div class="audio_editor" id="voice_profile_editor" show="true">
                     <div id="sliders">
                         <label class="editor_label" translation="voice.pitch">
-                            <input id="voice-pitch" class="editor_slider" type="range" min="-12" max="12" step="0.1" value="0" defaultValue="0"></input>
-                            <input type="text" id="voice-pitch-out" class="editor_output" />
+                            <input id="voice_pitch" class="editor_slider" type="range" min="-12" max="12" step="0.1" value="0" defaultValue="0"></input>
+                            <input type="text" id="voice_pitch_out" class="editor_output" />
                         </label>
 
                         <label id="label_editor_2" class="editor_label" translation="voice.intonation">
-                            <input id="voice-intonation" class="editor_slider" type="range" min="-1" max="1" step="0.01" value="0" defaultValue="0"></input>
-                            <input type="text" id="voice-intonation-out" class="editor_output" />
+                            <input id="voice_intonation" class="editor_slider" type="range" min="-1" max="1" step="0.01" value="0" defaultValue="0"></input>
+                            <input type="text" id="voice_intonation_out" class="editor_output" />
                         </label>
                     
                         <label id="label_editor_3" class="editor_label" translation="voice.variation">
-                            <input id="voice-variation" class="editor_slider" type="range" min="0" max="12" step="0.1" value="0" defaultValue="0.5"></input>
-                            <input type="text" id="voice-variation-out" class="editor_output" />
+                            <input id="voice_variation" class="editor_slider" type="range" min="0" max="12" step="0.1" value="0" defaultValue="0.5"></input>
+                            <input type="text" id="voice_variation_out" class="editor_output" />
                         </label>
                     </div>
 
@@ -193,7 +193,7 @@ author: joshxviii
                             <svg-button id="female" icon="female" onclick="selectVoiceType('female')"></svg-button>
                         </div>
 
-                        <select id="voice.type" class="female" tabindex="-1">
+                        <select id="voice_type" class="female" tabindex="-1">
                             <option id="label_f1" class="female" value="f1" translation="f1" selected></option>
                             <option id="label_f2" class="female" value="f2" translation="f2"></option>
                             <option id="label_f3" class="female" value="f3" translation="f3"></option>
@@ -226,7 +226,7 @@ author: joshxviii
                 <!-- NOTES -->
                 <div class="audio_editor" show="false">
                     <label class="editor_label" style="display: flex;" translation="note.instrument">
-                        <select id="inst_type" onchange="window.settings.set('instrument', this.value);">
+                        <select id="note_instrument">
                             <option value="girl">girl</option>
                             <option value="boy">boy</option>
                             <option value="cranky">cranky</option>
@@ -241,8 +241,8 @@ author: joshxviii
                     <br/>
                     <label class="editor_label" style="display: flex;" translation="note.transpose">
                         <div>
-                            <input id="note-transpose" class="editor_slider" type="range" min="-12" max="12" step="1" value="0" defaultValue="0"></input>
-                            <input type="text" id="note-transpose-out" class="editor_output" />
+                            <input id="note_transpose" class="editor_slider" type="range" min="-12" max="12" step="1" value="0" defaultValue="0"></input>
+                            <input type="text" id="note_transpose_out" class="editor_output" />
                         </div>
                     </label>
                 </div>
@@ -253,7 +253,7 @@ author: joshxviii
 
         <div id="master_volume_group">
             <input id="master" min="0" max="100" step="1" orient="vertical" type="range" defaultValue="50">
-            <input type="text" id="master-out" class="editor_output" display="percent" />
+            <input type="text" id="master_out" class="editor_output" display="percent" />
         </div>
 
     </div>

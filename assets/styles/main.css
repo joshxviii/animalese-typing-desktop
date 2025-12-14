@@ -420,24 +420,24 @@ svg-button:active  {
     height: 91%;
 }
 
-#master_volume {
+#master {
     width: 250px;
     transform: rotate(-90deg);
     transform-origin: center;
 }
-#master_volume::-webkit-slider-runnable-track {
+#master::-webkit-slider-runnable-track {
     width: 18px;
     height: 36px;
     cursor: pointer;
     background: var(--input-bg-color);
     border-radius: 10px;
 }
-#master_volume::-webkit-slider-thumb {
+#master::-webkit-slider-thumb {
     height: 36px;
     width: 18px;
 }
 
-#master_volume_out {
+#master_out {
     transform: translate(0, 120px);
     min-width: 80%;
 }
