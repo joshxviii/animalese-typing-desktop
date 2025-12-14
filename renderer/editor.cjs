@@ -415,7 +415,7 @@ function changeTab(newTabIndex = 1) {
 const specialLayout = [
     [
         {label:'Nothing', btnType:'l', sound:`#no_sound`},
-        {label:'Audio Toggle', btnType:'l', sound:`#1`},
+        {label:'Toggle Active', btnType:'l', sound:`#toggle_active`},
         {label:'Show Editor ', btnType:'l', sound:`#2`},
         {label:'N/A', btnType:'l', sound:`#3`}
     ],

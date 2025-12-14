@@ -40,25 +40,38 @@ function updateTheme(theme) {
 }
 //#endregion
 
+function handleSpecialCommand(command) {
+    switch (command) {
+        case '#toggle_active':
+            // const value = preferences.get('mute_app');
+            // preferences.set('mute_app', !value);
+        break;
+    }
+}
+
 //#region Key press detect
 window.api.onKeyDown( (keyInfo) => {
     const { keycode, isCapsLock, isShiftDown, finalSound } = keyInfo;
     
     if (finalSound === undefined || finalSound === '') return;
+    const isSpecial = finalSound.startsWith('#');
     const isVoice = finalSound.startsWith('&');
     const isInstrument = finalSound.startsWith('%');
     const isSfx = finalSound.startsWith('sfx')
     const options = {}
     if (!preferences.get('hold_repeat')) Object.assign(options, { hold: keycode });
     switch (true) {
-        case ( isVoice ):
-            // uppercase typing has higher pitch and variation
+        case ( isSpecial ):// handle special commands
+            handleSpecialCommand(finalSound);
+        return;
+            
+        case ( isVoice ): // uppercase typing has higher pitch and variation
             Object.assign(options, {
                 yelling: isCapsLock !== isShiftDown
             });
         break;
-        // notes should always hold until released with keyup 
-        case ( isInstrument ):
+        
+        case ( isInstrument ):// notes should always hold until released with keyup 
             Object.assign(options, {
                 hold: keycode,
                 pitchShift: isCapsLock? -12 : 0

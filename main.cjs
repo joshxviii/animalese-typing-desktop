@@ -1,4 +1,4 @@
-const { app, powerMonitor, Tray, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 const Store = require('electron-store').default;
 const isDev = require('electron-is-dev');
@@ -19,9 +19,10 @@ if (process.platform !== 'linux') {
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
-
+const MUTE_HOTKEY = 'CommandOrControl+Shift+I'; // TODO make hotkey configurable from apps remapper
 const SYSTRAY_ICON = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_18x18.png') : path.join(__dirname, '/assets/images/icon.png');
 const SYSTRAY_ICON_OFF = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_off_18x18.png') : path.join(__dirname, '/assets/images/icon_off.png');
+const SYSTRAY_ICON_MUTE = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_mute_18x18.png') : path.join(__dirname, '/assets/images/icon_mute.png');
 const ICON = path.join(__dirname, '/assets/images/icon.png');
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -33,13 +34,14 @@ function showIfAble() { // focus the existing window if it exists
 }
 
 function setDisable(value = true) {
-    value = preferences.get('mute_app') ? true : preferences.get('always_active') ? false : value;
+    muteValue = preferences.get('mute_app')
+    value = muteValue ? true : preferences.get('always_active') ? false : value;
+    if (tray) {
+        tray.setImage(muteValue?SYSTRAY_ICON_MUTE:value?SYSTRAY_ICON_OFF:SYSTRAY_ICON);
+        tray.setToolTip(muteValue?'Animalese Typing: Disabled':'Animalese Typing');
+    }
     if (disabled === value) return;
     disabled = value;
-    if (tray) {
-        tray.setImage(disabled?SYSTRAY_ICON_OFF:SYSTRAY_ICON);
-        tray.setToolTip(disabled?'Animalese Typing: Disabled':'Animalese Typing');
-    }
     if (disabled) stopKeyListener(); else startKeyListener();
 }
 
@@ -244,6 +246,8 @@ function updateTrayMenu() {
         {
             label:'Disable Animalese Typing',
             type: 'checkbox',
+            accelerator: MUTE_HOTKEY,
+            checked: preferences.get('mute_app'),
             click: (menuItem) => { 
                 const value = menuItem.checked;
                 preferences.set('mute_app', value);
@@ -272,6 +276,7 @@ function updateTrayMenu() {
                 app.setLoginItemSettings(settings);
             }
         },
+        { type: 'separator' },
         {
             label: 'Quit',
             click: () => {
@@ -388,6 +393,14 @@ app.on('ready', () => {
         if (!disabled) startKeyListener();
     });
 
+    globalShortcut.register(MUTE_HOTKEY, () => {// TODO make hotkey configurable from apps remapper
+        const muteValue = !preferences.get('mute_app');
+        preferences.set('mute_app', muteValue);
+        bgwin.webContents.send(`updated-mute_app`, muteValue);
+        setDisable(muteValue);
+        updateTrayMenu();
+    });
+
     if (app.isPackaged) autoUpdater.checkForUpdatesAndNotify();
 });
 
@@ -412,6 +425,7 @@ app.on('before-quit', () => {
     if (tray) tray.destroy();
 
     ipcMain.removeAllListeners();
+    globalShortcut.unregisterAll();
 });
 
 app.on('quit', () => {
