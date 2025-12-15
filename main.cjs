@@ -251,7 +251,7 @@ function updateTrayMenu() {
             click: (menuItem) => { 
                 const value = menuItem.checked;
                 preferences.set('mute_app', value);
-                bgwin.webContents.send(`updated-mute_app`, value); 
+                bgwin.webContents.send(`updated-mute_app`, value);
                 setDisable(value);
             }
         },
@@ -327,9 +327,9 @@ async function startKeyListener() {
         console.error('Unsupported platform'); return;
     }
     try {
-        if (fs.existsSync(listenerPath) && fs.statSync(listenerPath).isFile()) console.log('Starting key listener');
+        if (fs.existsSync(listenerPath) && fs.statSync(listenerPath).isFile()) console.log('Starting animalese-listener');
     } catch (err) {
-        console.error('ERROR: key listener not found at:', listenerPath);
+        console.error('ERROR: animalese-listener not found at:', listenerPath);
         return;
     }
 
@@ -362,10 +362,10 @@ async function startKeyListener() {
         console.log(`${platform}-listener:`, data.toString());
     });
     keyListener.on('error', (err) => {
-        console.error('keyListener spawn error:', err && err.message ? err.message : err);
+        console.error('animalese-listener spawn error:', err && err.message ? err.message : err);
     });
     keyListener.on('exit', (code, signal) => {
-        console.error('keyListener exited:', code, signal);
+        console.error('animalese-listener exited:', code, signal);
     });
 }
 //#endregion
