@@ -64,7 +64,8 @@ jobs:
           ELECTRON_BUILDER_PUBLISH: never
 
       - name: List Windows artifacts
-        run: dir exports /b
+        run: Get-ChildItem -Name exports
+        shell: pwsh
 
       - name: Upload Windows artifacts to draft release
         uses: softprops/action-gh-release@v2

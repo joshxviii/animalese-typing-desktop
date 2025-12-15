@@ -65,7 +65,7 @@
       "icon": "assets/images/icon.png",
       "extraResources": [
         {
-          "from": "animalese-listener",
+          "from": "libs/key-listeners/animalese-listener",
           "to": "animalese-listener"
         },
         {

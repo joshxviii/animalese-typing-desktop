@@ -13,12 +13,25 @@ export default async function (context) {
     const appPath = path.join(appOutDir, 'Animalese Typing.app');
     const resourcesDir = path.join(appPath, 'Contents/Resources');
     const frameworksDir = path.join(appPath, 'Contents/Frameworks');
+
     const binaryPath = path.join(resourcesDir, 'animalese-listener');
 
-    try {
-      fs.chmodSync(binaryPath, 0o755);
-    } catch (err) {
-      console.warn('[afterSign] Could not chmod animalese-listener:', err.message);
+    if (fs.existsSync(binaryPath)) {
+      try { 
+        fs.chmodSync(binaryPath, 0o755); 
+      } catch (err) { 
+        console.warn('[afterSign] Could not chmod animalese-listener:', err.message);
+      }
+    
+      try {
+        console.log('[afterSign] Signing animalese-listener...');
+        execSync(`codesign --force --sign - "${binaryPath}"`);
+      } catch (err) {
+        console.warn('[afterSign] Failed to codesign animalese-listener:', err.message);
+      }
+    }
+    else {
+      console.warn('[afterSign] animalese-listener not found at', binaryPath, '- skipping codesign.');
     }
 
     console.log('[afterSign] Copying libswift dylibs...');
