@@ -1,4 +1,4 @@
-const { Howl, Howler } = require('howler');// TODO: handle audio plakback manually, without howler.js.
+const { Howl, Howler } = require('howler');// TODO: handle audio playback manually, without howler.js.
 // handling it manually will allow me to change pitch without changing playback rate, which is not supported by howler.js
 const path = require('path');
 const { ipcRenderer } = require('electron');

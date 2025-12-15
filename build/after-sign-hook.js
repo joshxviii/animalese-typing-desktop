@@ -1,9 +1,9 @@
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const glob = require('glob');
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import glob from 'glob';
 
-module.exports = async function (context) {
+export default async function (context) {
   const { appOutDir } = context;
 
   const platformName = context.packager.platform.name;

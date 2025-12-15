@@ -4,23 +4,23 @@
   "version": "0.0.5",
   "description": "Animalese Typing",
   "repository": "https://github.com/joshxviii/animalese-typing-desktop",
-  "type": "commonjs",
+  "type": "module",
   "author": {
     "name": "joshxviii",
     "email": "dagexviii.dev@gmail.com"
   },
   "license": "MIT",
   "keywords": [],
-  "main": "main.cjs",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build:mac-listener":   "swiftc -o libs/key-listeners/animalese-listener-x64 libs/key-listeners/mac-key-listener.swift -target x86_64-apple-macosx11.0 && swiftc libs/key-listeners/mac-key-listener.swift -o animalese-listener-arm64 -target arm64-apple-macosx11.0 && lipo -create -output animalese-listener animalese-listener-x64 animalese-listener-arm64 && chmod +x libs/key-listeners/animalese-listener",
-    "build:win-listener":   "g++    -o libs/key-listeners/animalese-listener.exe libs/key-listeners/win-key-listener.cpp -mwindows -static -static-libgcc -static-libstdc++",
+    "build:mac-listener": "swiftc -o libs/key-listeners/animalese-listener-x64 libs/key-listeners/mac-key-listener.swift -target x86_64-apple-macosx11.0 && swiftc libs/key-listeners/mac-key-listener.swift -o animalese-listener-arm64 -target arm64-apple-macosx11.0 && lipo -create -output animalese-listener animalese-listener-x64 animalese-listener-arm64 && chmod +x libs/key-listeners/animalese-listener",
+    "build:win-listener": "g++    -o libs/key-listeners/animalese-listener.exe libs/key-listeners/win-key-listener.cpp -mwindows -static -static-libgcc -static-libstdc++",
     "build:linux-listener": "g++    -o libs/key-listeners/animalese-listener libs/key-listeners/linux-key-listener.cpp -lX11 -lXtst && chmod +x libs/key-listeners/animalese-listener",
-    "build:mac":    "npm run build:mac-listener && electron-builder --mac -p never",
-    "build:win":    "npm run build:win-listener && electron-builder --win -p never",
-    "build:linux":  "npm run build:linux-listener && electron-builder --linux -p never"
+    "build:mac": "npm run build:mac-listener && electron-builder --mac -p never",
+    "build:win": "npm run build:win-listener && electron-builder --win -p never",
+    "build:linux": "npm run build:linux-listener && electron-builder --linux -p never"
   },
   "build": {
     "icon": "assets/images/icon_256x256.png",
@@ -96,18 +96,16 @@
   },
   "dependencies": {
     "child_process": "^1.0.2",
-    "electron-is-dev": "^3.0.1",
     "electron-store": "^10.0.1",
-    "electron-updater": "^6.6.2",
     "howler": "^2.2.4",
-    "store": "^2.0.12"
+    "store": "^2.0.12",
+    "update-electron-app": "^3.1.2"
   },
   "devDependencies": {
     "electron": "^36.2.1",
     "electron-builder": "~24.13.3",
     "electron-rebuild": "^3.2.9"
-  }
-  ,
+  },
   "optionalDependencies": {
     "@deepfocus/get-windows": "^1.0.21"
   }

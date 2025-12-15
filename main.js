@@ -1,16 +1,20 @@
-const { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain } = require('electron');
-const path = require('path');
-const Store = require('electron-store').default;
-const isDev = require('electron-is-dev');
-const { spawn } = require('child_process');
-const fs = require('fs');
-const { autoUpdater } = require('electron-updater');
+import { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain } from 'electron';
+import path from 'path';
+import Store from 'electron-store';
+import { spawn } from 'child_process';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { updateElectronApp } from 'update-electron-app';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Conditionally import get-windows (not supported on Linux)
 let getFocusedWindow = null;
 if (process.platform !== 'linux') {
     try {
-        const getWindowsPkg = require('@deepfocus/get-windows');
+        const getWindowsPkg = await import('@deepfocus/get-windows');
         getFocusedWindow = getWindowsPkg.activeWindow;
     } catch (error) {
         console.warn('Window monitoring not available:', error.message);
@@ -19,6 +23,7 @@ if (process.platform !== 'linux') {
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
+const isDev = app.isPackaged === false;
 const SYSTRAY_ICON = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_18x18.png') : path.join(__dirname, '/assets/images/icon.png');
 const SYSTRAY_ICON_OFF = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_off_18x18.png') : path.join(__dirname, '/assets/images/icon_off.png');
 const SYSTRAY_ICON_MUTE = (process.platform === 'darwin') ? path.join(__dirname, '/assets/images/icon_mute_18x18.png') : path.join(__dirname, '/assets/images/icon_mute.png');
@@ -417,7 +422,7 @@ app.on('ready', () => {
     });
 
     updateDisableHotkey(preferences.get('disable_hotkey'));
-    if (app.isPackaged) autoUpdater.checkForUpdatesAndNotify();
+    if(!isDev) updateElectronApp();
 });
 
 app.on('activate', function () {
@@ -451,4 +456,4 @@ app.on('quit', () => {
     app.exit(0);
 });
 
-module.exports = app;
+export default app;
