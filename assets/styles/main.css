@@ -28,6 +28,25 @@ p {
     margin: 0px;
     text-align: center;
 }
+h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--main-text-color);
+    text-align: center;
+}
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--main-text-color);
+    text-align: center;
+    margin-block-start: 22px;
+    margin-block-end: 0px;
+}
+h3 {
+    font-size: 15px;
+    color: var(--main-text-color);
+    margin-block: 6px;
+}
 div[show=false], div[show=false] text {
     visibility: hidden;
     opacity: 0%;
@@ -81,7 +100,7 @@ div[show=false], div[show=false] text {
     height: 0px;
     padding: 2px;
     background-color: var(--secondary-bg-color);
-    margin: 6px auto 6px auto;
+    margin: 0px auto 6px auto;
     border-radius: 16px;
 }
 
@@ -757,12 +776,6 @@ input[type=text]::placeholder {
     align-self: anchor-center;
     gap: 12px;
 }
-#settings_overlay h3 {
-    font-size: 15px;
-    color: var(--main-text-color);
-    margin-block-start: 16px;
-    margin-block-end: 6px;
-}
 #settings_overlay label {
     font-size: 14px;
     color: rgb(from var(--main-text-color) r g b / 0.8);
@@ -777,7 +790,7 @@ input[type=text]::placeholder {
     width: 80%;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     align-items: center;
 }
 
@@ -819,14 +832,6 @@ td label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-h2 {
-    font-size: 18px;
-    font-weight: bold;
-    color: var(--main-text-color);
-    text-align: center;
-    margin: 0;
 }
 
 .rad_button_list {

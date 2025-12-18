@@ -1,0 +1,49 @@
+[
+    [
+        {"label":"1", "btnType":"s", "sound":"&.1"},
+        {"label":"2", "btnType":"s", "sound":"&.2"},
+        {"label":"3", "btnType":"s", "sound":"&.3"},
+        {"label":"4", "btnType":"s", "sound":"&.4"},
+        {"label":"5", "btnType":"s", "sound":"&.5"},
+        {"label":"6", "btnType":"s", "sound":"&.6"},
+        {"label":"7", "btnType":"s", "sound":"&.7"},
+        {"label":"8", "btnType":"s", "sound":"&.8"},
+        {"label":"9", "btnType":"s", "sound":"&.9"},
+        {"label":"0", "btnType":"s", "sound":"&.0"}
+    ],
+    [
+        {"label":"A", "btnType":"s", "sound":"&.a"},
+        {"label":"B", "btnType":"s", "sound":"&.b"},
+        {"label":"C", "btnType":"s", "sound":"&.c"},
+        {"label":"D", "btnType":"s", "sound":"&.d"},
+        {"label":"E", "btnType":"s", "sound":"&.e"},
+        {"label":"F", "btnType":"s", "sound":"&.f"},
+        {"label":"G", "btnType":"s", "sound":"&.g"},
+        {"label":"H", "btnType":"s", "sound":"&.h"},
+        {"label":"I", "btnType":"s", "sound":"&.i"},
+        {"label":"J", "btnType":"s", "sound":"&.j"},
+        {"label":"K", "btnType":"s", "sound":"&.k"},
+        {"label":"L", "btnType":"s", "sound":"&.l"},
+        {"label":"M", "btnType":"s", "sound":"&.m"}
+    ],
+    [
+        {"label":"N", "btnType":"s", "sound":"&.n"},
+        {"label":"O", "btnType":"s", "sound":"&.o"},
+        {"label":"P", "btnType":"s", "sound":"&.p"},
+        {"label":"Q", "btnType":"s", "sound":"&.q"},
+        {"label":"R", "btnType":"s", "sound":"&.r"},
+        {"label":"S", "btnType":"s", "sound":"&.s"},
+        {"label":"T", "btnType":"s", "sound":"&.t"},
+        {"label":"U", "btnType":"s", "sound":"&.u"},
+        {"label":"V", "btnType":"s", "sound":"&.v"},
+        {"label":"W", "btnType":"s", "sound":"&.w"},
+        {"label":"X", "btnType":"s", "sound":"&.x"},
+        {"label":"Y", "btnType":"s", "sound":"&.y"},
+        {"label":"Z", "btnType":"s", "sound":"&.z"}
+    ],
+    [
+        {"label":"OK", "btnType":"s", "sound":"&.ok"},
+        {"label":"GWAH", "btnType":"m", "sound":"&.gwah"},
+        {"label":"DESKA", "btnType":"m", "sound":"&.deska"}
+    ]
+]

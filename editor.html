@@ -32,10 +32,9 @@ author: joshxviii
 
     <div id="focus_out" show="false">
     <div id="settings_overlay">
-        <h2 id="settings_title" translation="settings"></h2>
-
+        <h2 translation="settings.general"></h2>
         <div class="separator"></div>
-        
+
         <div class="catagory">
             <h3 translation="settings.lang"></h3>
             <select id="lang_select" onchange="updateLanguage(`${this.value}`)">
@@ -60,7 +59,11 @@ author: joshxviii
         </div>
 
         <div class="catagory">
-            <h3 translation="settings.apps"></h3>
+            
+            <label translation="settings.startup">
+                <input type="checkbox" id="check_startup_run" onchange="window.settings.set('startup_run', this.checked)"/>
+            </label>
+
             <label translation="settings.always_active">
                 <input type="checkbox" id="check_always_active" onchange="window.settings.set('always_active', this.checked);document.querySelectorAll('#apps_table, #apps_toggle').forEach(el => el.setAttribute('disabled', this.checked))"/>
             </label>
@@ -84,45 +87,49 @@ author: joshxviii
             </table>
         </div>
 
-        <div class="catagory">
-            <h3 translation="settings.general"></h3>
+        <h2 translation="settings.audio"></h2>
+        <div class="separator"></div>
 
-            <label translation="settings.startup">
-                <input type="checkbox" id="check_startup_run" onchange="window.settings.set('startup_run', this.checked)"/>
-            </label>
+        <div class="catagory">
+            <h3 translation="settings.voice_language"></h3>
+            <select id="voice_language" onchange="updateVoiceLanguage(`${this.value}`)">
+                <option value="english" translation="voice.language.english"></option>
+                <option value="korean"  translation="voice.language.korean"></option>
+            </select>
+        </div>
+
+        <div class="catagory">
+            <h3 translation="settings.audio.mode"></h3>
+            <div class="rad_button_list">
+                <label translation="settings.audio.mode.1">
+                    <input type="radio" id="config_1" name="audio_mode" value="0" checked>
+                </label>
+
+                <label translation="settings.audio.mode.2">
+                    <input type="radio" id="config_2" name="audio_mode" value="1">
+                </label>
+
+                <label translation="settings.audio.mode.3">
+                    <input type="radio" id="config_3" name="audio_mode" value="2">
+                </label>
+
+                <label translation="settings.audio.mode.4">
+                    <input type="radio" id="config_4" name="audiosmode" value="3">
+                </label>
+            </div>
 
             <label translation="settings.hold_repeat">
                 <input type="checkbox" id="check_hold_repeat" onchange="window.settings.set('hold_repeat', this.checked)"/>
             </label>
-
-            <div class="rad_button_list">
-                <p translation="settings.audio_mode"></p>
-
-                <label translation="settings.audio_mode.1">
-                    <input type="radio" id="config_1" name="audio_mode" value="0" checked>
-                </label>
-
-                <label translation="settings.audio_mode.2">
-                    <input type="radio" id="config_2" name="audio_mode" value="1">
-                </label>
-
-                <label translation="settings.audio_mode.3">
-                    <input type="radio" id="config_3" name="audio_mode" value="2">
-                </label>
-
-                <label translation="settings.audio_mode.4">
-                    <input type="radio" id="config_4" name="audio_mode" value="3">
-                </label>
-            </div>
         </div>
 
-        <div class="catagory">
-            <br/>
-            <p translation="settings.reset.description"></p>
-            <button id="reset_settings" type="button"><span translation="settings.reset"></span></button>
-        </div>
-
+        <h2 translation="settings.reset"></h2>
         <div class="separator"></div>
+        <div class="catagory">
+            <p translation="settings.reset.description"></p>
+            <button id="reset_settings" type="button"><span translation="settings.reset.button"></span></button>
+        </div>
+
         <div class="footer" title="GitHub" style="cursor: pointer;">
             <p onclick="window.api.goToUrl('https:\/\/github.com/joshxviii/animalese-typing-desktop')">
                 Animalese Typing <text id="version"></text>
@@ -136,14 +143,9 @@ author: joshxviii
         <div id="main_content">
 
             <div id="top_row">
-                <div id="remap_controllers">
-                    <key-board layout-type="special" class="remap_controller" show="false"></key-board>
-                    <key-board layout-type="voice" class="remap_controller" show="true"></key-board>
-                    <piano-board class="remap_controller" show="false"></piano-board>
-                    <key-board layout-type="sfx" class="remap_controller" show="false"></key-board>
-                </div>
+                <div id="layout_container"></div>
 
-                <div style="width: 100%; margin: 0px 8px 0px 0px;">
+                <div style="flex: 1; margin: 0px 8px 0px 0px;">
                     <div id="key_remapper">
                         <div style="width: 100%;">
                             <h3 translation="remapper" style="margin-block: 6px 16px;"></h3>
@@ -158,10 +160,10 @@ author: joshxviii
 
 
                     <div id="remap_tabs">
-                        <svg-button class="remap_tab" onmousedown="changeTab(0);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" icon="config" title="Special Functions" pressed="false"></svg-button>
-                        <svg-button class="remap_tab" onmousedown="changeTab(1);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" icon="speech" title="Speech" pressed="true"></svg-button>
-                        <svg-button class="remap_tab" onmousedown="changeTab(2);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" icon="note" title="Instruments" pressed="false"></svg-button>
-                        <svg-button class="remap_tab" onmousedown="changeTab(3);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" icon="sfx" title="Sound Effects" pressed="false"></svg-button>
+                        <svg-button class="remap_tab" onmousedown="changeTab(0);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" id="special" icon="config" title="Special Functions" pressed="false"></svg-button>
+                        <svg-button class="remap_tab" onmousedown="changeTab(1);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" id="voice" icon="speech" title="Speech" pressed="true"></svg-button>
+                        <svg-button class="remap_tab" onmousedown="changeTab(2);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" id="piano" icon="note" title="Instruments" pressed="false"></svg-button>
+                        <svg-button class="remap_tab" onmousedown="changeTab(3);window.audio.play('sfx.default', { static: true, channel: 2, volume: 0.55 });" id="sfx" icon="sfx" title="Sound Effects" pressed="false"></svg-button>
                     </div>
                 </div>
             </div>
@@ -261,7 +263,8 @@ author: joshxviii
 
     </div>
 
-    <script src="./assets/jquery.js"></script>
+    <script src="./utils/jquery.js"></script>
+    <script src="./renderer/sound-board.cjs"></script>
     <script src="./renderer/animalese.cjs"></script>
     <script src="./renderer/editor.cjs"></script>
 </body>

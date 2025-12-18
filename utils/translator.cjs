@@ -4,12 +4,13 @@ const path = require('path');
 let translations = {}; // current selected language
 // default translations
 const defaultTranslations = 
-    JSON.parse(fs.readFileSync(path.join(__dirname, 'assets', 'lang', `en.json`), 'utf8'));
+    JSON.parse(fs.readFileSync(path.join(__dirname, '../assets/lang', `en.json`), 'utf8'));
 
 
 // load a language
 function loadLanguage(lang = 'en') {
-    const langFilePath = path.join(__dirname, 'assets', 'lang', `${lang}.json`);
+    const langFilePath = path.join(__dirname, '../assets/lang', `${lang}.json`);
+
     if (fs.existsSync(langFilePath)) {
         translations = JSON.parse(fs.readFileSync(langFilePath, 'utf8'));
     } else {

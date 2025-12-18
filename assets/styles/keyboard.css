@@ -1,12 +1,12 @@
 :root {
-    --key-size: 16px;
+    --button-size: 16px;
     --outline-width: 10px;
 }
 
 .remap_controller[show=false] {
     display: none;
 }
-.remap_controller {
+#layout_container {
     overflow: overlay;
     height: 163px;
     width: 416px;
@@ -18,25 +18,25 @@
     filter: drop-shadow(0 6px 0px var(--drop-shadow-color));
 }
 
-.highlighted, .highlighted .key-label, .highlighted .button-top, .highlighted[btn-type=b] .button-top {
+.highlighted, .highlighted .button-label, .highlighted .button-top, .highlighted[btn-type=b] .button-top {
     fill: var(--input-highlight-color-2);
     --alt1-color: var(--input-highlight-color-2);
     color: var(--input-highlight-text-color);
 }
-.highlighted .key-icon {
+.highlighted .button-icon {
      fill: var(--input-highlight-text-color);
 }
 
 /*#region KEYBOARD */
-key-board {
+sound-board {
     display: inline-block;
     flex: 0 0 auto;
 }
-.key-label-wrapper {
+.button-label-wrapper {
     position: relative;
     display: inline-block;
 }
-.key-label {
+.button-label {
     z-index: 1;
     position: absolute;
     pointer-events: none;
@@ -50,15 +50,15 @@ key-board {
     transition: transform 0.33s ease, font-size 0.2s ease;
 }
 
-piano-key .key-label 
-{font-size: clamp(1px, 100%, calc(var(--key-size) * 2 / max(1, var(--label-length))));}
-piano-key[btn-type=b] .key-label
-{font-size: clamp(1px, 100%, calc(var(--key-size) * 2 / max(1, (var(--label-length)*.5))));}
-.key_s .key-label {font-size: clamp(1px, 100%, calc(var(--key-size) * 1 / max(1, (var(--label-length)*.33))));}
-.key_m .key-label {font-size: clamp(1px, 100%, calc(var(--key-size) * 2 / max(1, (var(--label-length)*.33))));}
-.key_l .key-label {font-size: clamp(1px, 100%, calc(var(--key-size) * 3 / max(1, (var(--label-length)*.33))));}
+piano-key .button-label 
+{font-size: clamp(1px, 100%, calc(var(--button-size) * 2 / max(1, var(--label-length))));}
+piano-key[btn-type=b] .button-label
+{font-size: clamp(1px, 100%, calc(var(--button-size) * 2 / max(1, (var(--label-length)*.5))));}
+.button_s .button-label {font-size: clamp(1px, 100%, calc(var(--button-size) * 1 / max(1, (var(--label-length)*.33))));}
+.button_m .button-label {font-size: clamp(1px, 100%, calc(var(--button-size) * 2 / max(1, (var(--label-length)*.33))));}
+.button_l .button-label {font-size: clamp(1px, 100%, calc(var(--button-size) * 3 / max(1, (var(--label-length)*.33))));}
 
-.key-icon {
+.button-icon {
     position: absolute;
     pointer-events: none;
     width: 60%;
@@ -70,36 +70,36 @@ piano-key[btn-type=b] .key-label
     stroke: var(--accent-color);
     transition: transform 0.33s ease;
 }
-.key-row {
-    height: calc(1.05 * var(--key-size * 2));
+.button-row {
+    height: calc(1.05 * var(--button-size * 2));
 }
-key-button, .key_s, .key_m, .key_l, .key_blank {
-    width: calc(var(--key-size) * 2);
-    height: calc(var(--key-size) * 2);
+sound-button, .button_s, .button_m, .button_l, .button_blank {
+    width: calc(var(--button-size) * 2);
+    height: calc(var(--button-size) * 2);
     margin-right: -2px;
 }
-.key_s {min-width: calc(1* var(--key-size) * 2);}
-.key_m {min-width: calc(2* var(--key-size) * 2);}
-.key_l {min-width: calc(3* var(--key-size) * 2);}
+.button_s {min-width: calc(1* var(--button-size) * 2);}
+.button_m {min-width: calc(2* var(--button-size) * 2);}
+.button_l {min-width: calc(3* var(--button-size) * 2);}
 
-key-button .button-top {
+sound-button .button-top {
     fill: var(--secondary-bg-color);
     transform: translate(0px,0px);
     transition: all 0.33s ease;
 }
 
-key-button.pressed .button-top {
+sound-button.pressed .button-top {
     fill:var(--input-highlight-color);
     transform: translate(0px,4px);
     transition: transform 0.07s ease;
 }
-key-button.pressed .key-label {
+sound-button.pressed .button-label {
     color: var(--input-highlight-text-color);
     transform: translate(-50%, calc(-50% + 12.5%));
     transition: transform 0.07s ease;
 }
 
-key-button.pressed .key-icon {
+sound-button.pressed .button-icon {
     fill: var(--input-highlight-text-color);
     transform: translate(-50%, calc(-50% + 8%));
     transition: transform 0.07s ease;
@@ -120,7 +120,7 @@ piano-board {
     width: 100%;
     padding: 8px;
     margin: 0px -8px;
-    height: calc(var(--key-size) * 2.5);
+    height: calc(var(--button-size) * 2.5);
     transform: translateY(-8px);
 }
 #piano_keys {
@@ -130,32 +130,32 @@ piano-board {
     display: inline-flex;
     justify-content:flex-start;
 }
-piano-key .key-label {
+piano-key .button-label {
     color: #00000010;
     translate: -2px  26px;
 }
 piano-key, .piano_l, .piano_m, .piano_r, .piano_b {
-    transform: translateX(calc(var(--key-size) / 3));
-    margin: 0px calc(var(--key-size) * -0.5);
+    transform: translateX(calc(var(--button-size) / 3));
+    margin: 0px calc(var(--button-size) * -0.5);
     pointer-events: none;
     position: relative;
     z-index: 1;
-    min-width: calc(var(--key-size) * 3);
-    min-height: calc(var(--key-size) * 6);
-    width: calc(var(--key-size) * 3);
-    height: calc(var(--key-size) * 6);
+    min-width: calc(var(--button-size) * 3);
+    min-height: calc(var(--button-size) * 6);
+    width: calc(var(--button-size) * 3);
+    height: calc(var(--button-size) * 6);
     display: inline-block;
 }
 
 piano-key[btn-type=b], .piano_b {
     z-index: 0;
-    min-width: calc(var(--key-size) * 2);
-    min-height: calc(var(--key-size) * 4.5);
-    width: calc(var(--key-size) * 2);
-    height: calc(var(--key-size) * 4.5);
+    min-width: calc(var(--button-size) * 2);
+    min-height: calc(var(--button-size) * 4.5);
+    width: calc(var(--button-size) * 2);
+    height: calc(var(--button-size) * 4.5);
 }
 piano-key[btn-type=b] {
-    margin: 0px calc(var(--key-size) * -1);
+    margin: 0px calc(var(--button-size) * -1);
 }
 
 piano-key .button-top {
@@ -177,7 +177,7 @@ piano-key.pressed .button-top {
     transform: translate(0px,4px);
     transition: transform 0.07s ease;
 }
-piano-key.pressed .key-label {
+piano-key.pressed .button-label {
     color: #ffffff;
     transform: translate(-50%, calc(-50% + 4px));
     transition: transform 0.07s ease;

@@ -1,0 +1,30 @@
+[
+    [
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.backspace"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.enter"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.tab"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.question"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.exclamation"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.at"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.pound"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.dollar"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.caret"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.ampersand"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.asterisk"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.parenthesis_open"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.parenthesis_closed"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.bracket_open"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.bracket_closed"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.brace_open"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.brace_closed"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.tilde"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.default"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.arrow_left"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.arrow_up"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.arrow_right"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.arrow_down"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.slash_forward"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.slash_back"},
+        {"label":"sfx", "icon":"question", "btnType":"s", "sound":"sfx.percent"}
+    ]
+]

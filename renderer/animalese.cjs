@@ -50,6 +50,11 @@ function updateTheme(theme) {
     }
 }
 
+window.updateVoiceLanguage = (language) => {
+    preferences.set('voice_language', language);
+    window.audio.play('&.ok', { noRandom: true});
+}
+
 window.api.onMutedChanged((muted) => {
     const disableButton = document.getElementById('disable_app_button');
     if (disableButton) {

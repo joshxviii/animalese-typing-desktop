@@ -71,6 +71,7 @@ const defaults = {
     always_active: true,
     selected_apps: [],
     selected_active: true,
+    voice_language: 'english',
     voice_profile: {
         type: 'f1',
         pitch: 0.0,
