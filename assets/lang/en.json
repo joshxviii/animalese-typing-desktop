@@ -11,6 +11,9 @@
     "note.transpose":"transpose",
 
     "editor_title":"Editor",
+    "voice.language":"voice language",
+    "voice.language.english":"English",
+    "voice.language.korean":"Korean (한국어)",
     "voice.pitch":"pitch shift",
     "voice.intonation":"intonation",
     "voice.variation":"pitch variation",
@@ -50,6 +53,7 @@
     "settings.always_active":"always active",
     "settings.hold_repeat":"repeat sound while held",
     "settings.lang":"language",
+    "settings.voice_language":"voice language",
     "settings.none":"none",
     "settings.reset":"reset",
     "settings.reset.description":"hold to reset settings",

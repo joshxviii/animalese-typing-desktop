@@ -11,6 +11,9 @@
     "note.transpose":"조옮김",
 
     "editor_title":"편집기",
+    "voice.language":"음성 언어",
+    "voice.language.english":"영어 (English)",
+    "voice.language.korean":"한국어",
     "voice.pitch":"음정 변경",
     "voice.intonation":"억양",
     "voice.variation":"음높이 변화",
@@ -50,6 +53,7 @@
     "settings.always_active":"모든 앱에서 활성화",
     "settings.hold_repeat":"누르는 동안 반복 재생",
     "settings.lang":"언어 선택",
+    "settings.voice_language":"음성 언어",
     "settings.none":"없음",
     "settings.reset":"초기화",
     "settings.reset.description":"길게 눌러 설정 초기화",

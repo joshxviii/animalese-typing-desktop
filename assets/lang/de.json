@@ -11,6 +11,9 @@
     "note.transpose":"transponieren",
 
     "editor_title":"Editor",
+    "voice.language":"stimmsprache",
+    "voice.language.english":"Englisch (English)",
+    "voice.language.korean":"Koreanisch (한국어)",
     "voice.pitch":"tonhöhenversch.",
     "voice.intonation":"intonation",
     "voice.variation":"tonvariation",
@@ -50,6 +53,7 @@
     "settings.always_active":"immer aktiviert",
     "settings.hold_repeat":"bei halten wiederholen",
     "settings.lang":"sprache",
+    "settings.voice_language":"stimmsprache",
     "settings.none":"keine",
     "settings.reset":"zurücksetzen",
     "settings.reset.description":"halten, um einstellungen zu resetten",

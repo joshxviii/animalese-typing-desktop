@@ -50,6 +50,14 @@ author: joshxviii
         </div>
 
         <div class="catagory">
+            <h3 translation="settings.voice_language"></h3>
+            <select id="voice_language" onchange="updateVoiceLanguage(`${this.value}`)">
+                <option value="english" translation="voice.language.english"></option>
+                <option value="korean"  translation="voice.language.korean"></option>
+            </select>
+        </div>
+
+        <div class="catagory">
             <h3 translation="settings.theme"></h3>
             <select id="theme_select" onchange="updateTheme(`${this.value}`)">
                 <option value="default" translation="settings.theme.default"></option>

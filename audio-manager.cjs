@@ -11,6 +11,11 @@ let note_profile = ipcRenderer.sendSync('get-store-data-sync').note_profile;
 ipcRenderer.on('updated-note_profile', (_, value) => note_profile = value);
 let mode = ipcRenderer.sendSync('get-store-data-sync').audio_mode;
 ipcRenderer.on('updated-audio_mode', (_, value) => mode = value);
+let voice_language = ipcRenderer.sendSync('get-store-data-sync').voice_language || 'english';
+ipcRenderer.on('updated-voice_language', (_, value) => {
+    voice_language = value;
+    rebuildSoundBanks();
+});
 
 const audio_path = path.join(__dirname, './assets/audio/');
 const file_type = ".ogg";
@@ -109,14 +114,19 @@ function createAudioInstance(fileName, sprite = null) {
         onloaderror: (id, err) => console.error('Load error:', err)
     });
 }
-function buildSoundBanks() {
-    const voices = ['f1', 'f2', 'f3', 'f4', 'm1', 'm2', 'm3', 'm4'];
 
+const voiceTypes = ['f1', 'f2', 'f3', 'f4', 'm1', 'm2', 'm3', 'm4'];
+let soundBanks = null;
+
+function buildSoundBanks() {
     const instrumentVoices = ['girl', 'boy', 'cranky', 'kk_slider'];
     const instruments = ['organ', 'guitar', 'e_piano', 'synth', 'whistle'];
 
     const bank = {};
-    for (const voice of voices) bank[voice] = createAudioInstance(`voice/${voice}`, voice_sprite)
+    
+    for (const voice of voiceTypes) {
+        bank[voice] = createAudioInstance(`voice/${voice_language}/${voice}`, voice_sprite);
+    }
 
     bank['inst'] = {}
     for (const inst of instrumentVoices) bank.inst[inst] = createAudioInstance(`instrument/${inst}`, sing); 
@@ -124,6 +134,17 @@ function buildSoundBanks() {
 
     bank['sfx'] = createAudioInstance('sfx', sfx_sprite);
     return bank;
+}
+
+function rebuildSoundBanks() {
+    if (!soundBanks) {
+        soundBanks = buildSoundBanks();
+        return;
+    }    
+    for (const voice of voiceTypes) {
+        soundBanks[voice]?.unload();
+        soundBanks[voice] = createAudioInstance(`voice/${voice_language}/${voice}`, voice_sprite);
+    }
 }
 
 function releaseSound(release_id, cut = true) {
@@ -170,7 +191,7 @@ function cutOffAudio(audio, release=0.025) {
 function createAudioManager() {
 
     const audioFileCache = {};
-    const soundBanks = buildSoundBanks();
+    soundBanks = buildSoundBanks();
 
     // main audio playback function
     function playSound(path, {volume=1, pitchShift=0, pitchVariation=0, intonation=0, note=60, channel=undefined, hold=undefined, noRandom=false, yelling=false} = {}) {

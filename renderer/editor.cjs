@@ -37,6 +37,7 @@ const controls = [
     'note_instrument',
     'note_transpose'
 ];
+
 let voiceProfile = null;
 let voiceProfileSlots = null;
 const profileName = document.getElementById('voice_profile_name');
@@ -61,6 +62,7 @@ function initControls() {
 
     document.getElementById('lang_select').value = preferences.get('lang');
     checkStartupRun.checked = preferences.get('startup_run');
+    document.getElementById('voice_language').value = preferences.get('voice_language') || 'english';
     document.getElementById('note_instrument').value = preferences.get('note_profile').instrument;
     document.getElementById('check_always_active').checked = preferences.get('always_active');
     document.getElementById('check_hold_repeat').checked = preferences.get('hold_repeat');

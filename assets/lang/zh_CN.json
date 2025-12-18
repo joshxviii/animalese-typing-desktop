@@ -11,6 +11,9 @@
     "note.transpose":"移调",
 
     "editor_title":"编辑器",
+    "voice.language":"语音语言",
+    "voice.language.english":"英语 (English)",
+    "voice.language.korean":"韩语 (한국어)",
     "voice.pitch":"音调变化",
     "voice.intonation":"语调",
     "voice.variation":"音高变化",
@@ -50,6 +53,7 @@
     "settings.always_active":"始终启用",
     "settings.hold_repeat":"长按重复",
     "settings.lang":"选择语言",
+    "settings.voice_language":"语音语言",
     "settings.none":"无",
     "settings.reset":"重置",
     "settings.reset.description":"长按以重置设置",

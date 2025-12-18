@@ -11,6 +11,9 @@
     "note.transpose":"移調",
 
     "editor_title":"編集ソフト",
+    "voice.language":"音声言語",
+    "voice.language.english":"英語 (English)",
+    "voice.language.korean":"韓国語 (한국어)",
     "voice.pitch":"ピッチシフト",
     "voice.intonation":"抑揚",
     "voice.variation":"音程変化",
@@ -50,6 +53,7 @@
     "settings.always_active":"常に有効",
     "settings.hold_repeat":"長押しで繰り返す",
     "settings.lang":"言語選択",
+    "settings.voice_language":"音声言語",
     "settings.none":"なし",
     "settings.reset":"リセット",
     "settings.reset.description":"長押しで設定をリセット",

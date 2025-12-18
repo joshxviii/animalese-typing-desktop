@@ -11,6 +11,9 @@
     "note.transpose":"transposer",
 
     "editor_title":"Éditeur",
+    "voice.language":"langue vocale",
+    "voice.language.english":"Anglais (English)",
+    "voice.language.korean":"Coréen (한국어)",
     "voice.pitch":"variation hauteur",
     "voice.intonation":"intonation",
     "voice.variation":"variation de ton",
@@ -50,6 +53,7 @@
     "settings.always_active":"toujours activé",
     "settings.hold_repeat":"répéter en maintenant",
     "settings.lang":"langue",
+    "settings.voice_language":"langue vocale",
     "settings.none":"aucune",
     "settings.reset":"réinitialiser",
     "settings.reset.description":"maintenir pour réinitialiser",
