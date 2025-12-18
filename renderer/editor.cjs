@@ -73,7 +73,6 @@ function initControls() {
     document.querySelectorAll('input[name="audio_mode"]').forEach(radio => {// audio mode initilize 
         radio.checked = parseInt(radio.value) === preferences.get('audio_mode');
         radio.addEventListener('change', () => {
-            console.log('Audio mode changed to:', radio.value);
             if (radio.checked) preferences.set('audio_mode', parseInt(radio.value));
         });
     });
@@ -106,13 +105,11 @@ function initControls() {
             if (control==='master') preferences.set('volume', value*.01);
             else if (control.startsWith('voice')) {
                 voiceProfile[control.split('_')[1]] = value;
-                console.log(`Voice profile updated: ${control.split('_')[1]} = ${value}`, voiceProfile);
 
                 preferences.set('voice_profile', voiceProfile);
             }
             else if (control.startsWith('note')) {
                 noteProfile[control.split('_')[1]] = value;
-                console.log(`Note profile updated: ${control.split('_')[1]} = ${value}`, noteProfile);
 
                 preferences.set('note_profile', noteProfile);
             }
@@ -244,7 +241,6 @@ function updatedFocusedWindows(activeWindows = []) {
 }
 
 function updateEnabledApps(appName, isChecked) {
-    console.log("change", appName, isChecked);
     let enabledApps = preferences.get('selected_apps')
 
     if (isChecked && !enabledApps.includes(appName)) enabledApps.push(appName);
@@ -412,8 +408,6 @@ function remapStart() {
     else if (isAltDown)keyLabel = `Alt + ${key}`;
     else if (isShiftDown) keyLabel = `Shift + ${key}`;
     remapMonitor.innerHTML = keyLabel.toUpperCase();
-
-    console.log("Final sound:", finalSound);
 }
 
 function changeTab(newTabIndex = 1) {
@@ -425,325 +419,17 @@ function changeTab(newTabIndex = 1) {
     allTabs[newTabIndex].setAttribute('pressed',true);
     if(isRemapping) allTabs[newTabIndex].classList.add('highlighted');
 
+    updateBoardLayout(allTabs[newTabIndex].id);
     if (newTabIndex === tabIndex) return;
-    const allControllers = document.querySelectorAll('#remap_controllers .remap_controller');
+
     const allEditors = document.querySelectorAll('#bottom_row .audio_editor');
-
-    allControllers.forEach(el => el.setAttribute('show',false));
     allEditors.forEach(el => el.setAttribute('show',false));
-
-    allControllers[newTabIndex].setAttribute('show',true);
     allEditors[newTabIndex].setAttribute('show',true);
 
     tabIndex = newTabIndex;
 
     if (newTabIndex === 2) centerPianoKeys();
 }
-//#endregion
-
-
-//#region Remap controllers
-const specialLayout = [
-    [
-        {label:'Nothing', btnType:'l', sound:`#no_sound`},
-        {label:'Disable App', btnType:'l', sound:`#disable_toggle`},
-        {label:'Show Editor ', btnType:'l', sound:`#show_window`},
-        // {label:'N/A', btnType:'l', sound:`#3`}
-    ],
-]
-
-const voiceLayout = [
-    [
-        {label:'1', btnType:'s', sound:`&.1`},
-        {label:'2', btnType:'s', sound:`&.2`},
-        {label:'3', btnType:'s', sound:`&.3`},
-        {label:'4', btnType:'s', sound:`&.4`},
-        {label:'5', btnType:'s', sound:`&.5`},
-        {label:'6', btnType:'s', sound:`&.6`},
-        {label:'7', btnType:'s', sound:`&.7`},
-        {label:'8', btnType:'s', sound:`&.8`},
-        {label:'9', btnType:'s', sound:`&.9`},
-        {label:'0', btnType:'s', sound:`&.0`},
-    ],
-    [
-        {label:'A', btnType:'s', sound:`&.a`},
-        {label:'B', btnType:'s', sound:`&.b`},
-        {label:'C', btnType:'s', sound:`&.c`},
-        {label:'D', btnType:'s', sound:`&.d`},
-        {label:'E', btnType:'s', sound:`&.e`},
-        {label:'F', btnType:'s', sound:`&.f`},
-        {label:'G', btnType:'s', sound:`&.g`},
-        {label:'H', btnType:'s', sound:`&.h`},
-        {label:'I', btnType:'s', sound:`&.i`},
-        {label:'J', btnType:'s', sound:`&.j`},
-        {label:'K', btnType:'s', sound:`&.k`},
-        {label:'L', btnType:'s', sound:`&.l`},
-        {label:'M', btnType:'s', sound:`&.m`}
-    ],
-    [
-        {label:'N', btnType:'s', sound:`&.n`},
-        {label:'O', btnType:'s', sound:`&.o`},
-        {label:'P', btnType:'s', sound:`&.p`},
-        {label:'Q', btnType:'s', sound:`&.q`},
-        {label:'R', btnType:'s', sound:`&.r`},
-        {label:'S', btnType:'s', sound:`&.s`},
-        {label:'T', btnType:'s', sound:`&.t`},
-        {label:'U', btnType:'s', sound:`&.u`},
-        {label:'V', btnType:'s', sound:`&.v`},
-        {label:'W', btnType:'s', sound:`&.w`},
-        {label:'X', btnType:'s', sound:`&.x`},
-        {label:'Y', btnType:'s', sound:`&.y`},
-        {label:'Z', btnType:'s', sound:`&.z`}
-    ],
-    [
-        {label:'OK', btnType:'s', sound:`&.ok`},
-        {label:'GWAH', btnType:'m', sound:`&.gwah`},
-        {label:'DESKA', btnType:'m', sound:`&.deska`},
-    ]
-];
-
-const pianoLayout = [
-    {label:'C2', btnType:'l', sound:'%.36'},
-    { btnType:'b',sound:'%.37'},
-    {btnType:'m', sound:'%.38'},
-    { btnType:'b',sound:'%.39'},
-    {btnType:'r', sound:'%.40'},
-    {btnType:'l', sound:'%.41'},
-    { btnType:'b',sound:'%.42'},
-    {btnType:'m', sound:'%.43'},
-    { btnType:'b',sound:'%.44'},
-    {btnType:'m', sound:'%.45'},
-    { btnType:'b',sound:'%.46'},
-    {btnType:'r', sound:'%.47'},
-
-    {label:'C3', btnType:'l', sound:'%.48'},
-    { btnType:'b',sound:'%.49'},
-    {btnType:'m', sound:'%.50'},
-    { btnType:'b',sound:'%.51'},
-    {btnType:'r', sound:'%.52'},
-    {btnType:'l', sound:'%.53'},
-    { btnType:'b',sound:'%.54'},
-    {btnType:'m', sound:'%.55'},
-    { btnType:'b',sound:'%.56'},
-    {btnType:'m', sound:'%.57'},
-    { btnType:'b',sound:'%.58'},
-    {btnType:'r', sound:'%.59'},
-
-    {label:'C4', btnType:'l', sound:'%.60'},
-    { btnType:'b',sound:'%.61'},
-    {btnType:'m', sound:'%.62'},
-    { btnType:'b',sound:'%.63'},
-    {btnType:'r', sound:'%.64'},
-    {btnType:'l', sound:'%.65'},
-    { btnType:'b',sound:'%.66'},
-    {btnType:'m', sound:'%.67'},
-    { btnType:'b',sound:'%.68'},
-    {btnType:'m', sound:'%.69'},
-    { btnType:'b',sound:'%.70'},
-    {btnType:'r', sound:'%.71'},
-
-    {label:'C5', btnType:'l', sound:'%.72'},
-    { btnType:'b',sound:'%.73'},
-    {btnType:'m', sound:'%.74'},
-    { btnType:'b',sound:'%.75'},
-    {btnType:'r', sound:'%.76'},
-    {btnType:'l', sound:'%.77'},
-    { btnType:'b',sound:'%.78'},
-    {btnType:'m', sound:'%.79'},
-    { btnType:'b',sound:'%.80'},
-    {btnType:'m', sound:'%.81'},
-    { btnType:'b',sound:'%.82'},
-    {btnType:'r', sound:'%.83'},
-
-    {label:'C6', btnType:'l', sound:'%.84'},
-    { btnType:'b',sound:'%.85'},
-    {btnType:'m', sound:'%.86'},
-    { btnType:'b',sound:'%.87'},
-    {btnType:'r', sound:'%.88'},
-    {btnType:'l', sound:'%.89'},
-    { btnType:'b',sound:'%.90'},
-    {btnType:'m', sound:'%.91'},
-    { btnType:'b',sound:'%.92'},
-    {btnType:'m', sound:'%.93'},
-    { btnType:'b',sound:'%.94'},
-    {btnType:'r', sound:'%.95'},
-]
-
-const sfxLayout = [
-    [
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.backspace'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.enter'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.tab'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.question'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.exclamation'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.at'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.pound'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.dollar'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.caret'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.ampersand'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.asterisk'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.parenthesis_open'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.parenthesis_closed'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.bracket_open'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.bracket_closed'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.brace_open'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.brace_closed'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.tilde'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.default'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.arrow_left'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.arrow_up'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.arrow_right'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.arrow_down'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.slash_forward'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.slash_back'},
-        {label:'sfx', icon:'question', btnType:'s', sound:'sfx.percent'}
-    ]
-]
-
-customElements.define('key-button', class extends HTMLElement {
-    connectedCallback() {
-        const btnType =this.getAttribute('btn-type') ?? 's';
-        const label = this.getAttribute('label');
-        const svgIcon = this.getAttribute('icon');
-        this.id = `key-${label.replace(/\s+/g, '_')}`
-        this.data = {
-            label: label ?? '',
-            sound: this.getAttribute('sound') ?? 'sfx.default'
-        }
-
-        fetch(`assets/svg/key_${btnType}.svg`)
-        .then(res => res.text())
-        .then(svg => {
-            this.innerHTML = `
-                <span class='key-label-wrapper key_${btnType}'>
-                    ${svg}
-                    ${
-                        svgIcon?`<span class="key-icon-wrapper"></span>`:
-                        label?`<span class='key-label'>${label}</span>`:''
-                    }
-                </span>
-            `;
-            this.querySelector('svg').classList.add(`key_${btnType}`);
-
-            // if an icon is specified, fetch and use that for the label
-            if (svgIcon) {
-                fetch(`assets/svg/${svgIcon}.svg`)
-                .then(iconRes => iconRes.text())
-                .then(iconSvg => {
-                    const iconWrapper = this.querySelector('.key-icon-wrapper');
-                    iconWrapper.innerHTML = iconSvg;
-                    iconWrapper.querySelector('svg').classList.add('key-icon');
-                });
-            }
-            this.addEventListener('mouseenter', (e) => {if (e.buttons >0) press(this);});
-            this.addEventListener('mousedown', (e) => {press(this);});
-        });
-    }
-});
-customElements.define('key-board', class extends HTMLElement {
-    connectedCallback() {
-        const layoutType = this.getAttribute('layout-type');
-        const layout = layoutType==="voice"?voiceLayout:layoutType==="sfx"?sfxLayout:specialLayout
-
-        for (let row of layout){
-        const _row = $( `<div class='key-row'></div>`);
-            for (let key of row) {
-                const label = key.label?`label="${key.label}"`:'';
-                const sound = key.sound?`sound="${key.sound}"`:'';
-                const btnType = key.btnType?`btn-type="${key.btnType}"`:'';
-                const icon = key.icon?`icon="${key.icon}"`:'';
-                const _key = $(
-                    key.label?`<key-button ${label} ${sound} ${btnType} ${icon} style="--label-length: ${key.label?.length};"></key-button>`:
-                    `<div class='key_blank'></div>`
-                );
-                _key.appendTo(_row);
-            }
-        _row.appendTo(this);
-        }
-    }
-});
-
-customElements.define('piano-key', class extends HTMLElement {
-    connectedCallback() {
-        const btnType = this.getAttribute('btn-type');
-        const label = this.getAttribute('label');
-        this.data = {
-            label: label ?? '',
-            sound: this.getAttribute('sound') ?? 'sfx.default'
-        }
-
-        fetch(`assets/svg/piano_${btnType}.svg`)
-        .then(res => res.text())
-        .then(svg => {
-            this.innerHTML = `
-                <span class='piano_${btnType}'>
-                    ${svg}
-                    ${label?`<span class='key-label'>${label}</span>`:''}
-                </span>
-            `;
-            this.querySelector('svg').classList.add(`piano_${btnType}`);
-
-            this.addEventListener('mouseenter', (e) => {if (e.buttons > 0) press(this, true);});
-            this.addEventListener('mousedown', (e) => {press(this, true);});
-            this.addEventListener('mouseleave', (e) => {release(this);});
-            this.addEventListener('mouseup', (e) => {release(this);});
-        });
-    }
-});
-
-customElements.define('piano-board', class extends HTMLElement {
-    connectedCallback() {
-        const back = $(`<div id="piano_back"></div>`);
-        const keys = $(`<div id="piano_keys"></div>`);
-        keys.appendTo(this);
-        for (let key of pianoLayout) {
-            const label = key.label?`label=${key.label}`:'';
-            const sound = key.sound?`sound=${key.sound}`:'';
-            const btnType = key.btnType?`btn-type=${key.btnType}`:'';
-            const _key = $(
-                `<piano-key ${label} ${sound} ${btnType} style="--label-length: ${key.label?.length};"></piano-key>`
-            );
-            _key.appendTo(keys);
-        }
-        back.appendTo(this);
-        keys.appendTo(this);
-
-        // auto scroll keys when near the edges
-        const piano_keys = document.getElementById('piano_keys');
-        let scrollDirection = 0;
-        let animationFrameId = null;
-        let wheelTimeoutId = null;
-
-        function scrollPianoKeys() {
-            if (scrollDirection !== 0) {
-                piano_keys.scrollLeft += scrollDirection;
-                animationFrameId = requestAnimationFrame(scrollPianoKeys);
-            } else if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        }
-
-        function startScroll() {
-            if (!animationFrameId) animationFrameId = requestAnimationFrame(scrollPianoKeys);
-        }
-        function stopScroll() {
-            scrollDirection = 0;
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        }
-
-        piano_keys.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            scrollDirection = (e.deltaY || e.detail || e.wheelDelta) > 0 ? 10 : -10;
-            startScroll();
-            if (wheelTimeoutId) clearTimeout(wheelTimeoutId);
-            wheelTimeoutId = setTimeout(stopScroll, 80);
-        });
-    }
-});
 
 function centerPianoKeys() {
     const piano_keys = document.getElementById('piano_keys');
@@ -753,24 +439,4 @@ function centerPianoKeys() {
         piano_keys.scrollLeft = (piano_keys.scrollWidth - piano_keys.clientWidth) / 2;
     }
 }
-
-function press(btn, holdKey=false) {
-    if (!btn.classList.contains('pressed')) {
-        const sound = btn.getAttribute('sound');
-        if (!sound) return;
-        btn.classList.add('pressed');
-        if (holdKey) {
-            window.audio.play(sound, {noRandom: true, hold: 0});
-        }
-        else {
-            window.audio.play(sound, {noRandom: true});
-            setTimeout(() => btn.classList.remove('pressed'), 100);
-        }
-        window.api.sendRemapSound(sound);
-    }
-}
-
-function release(btn) {
-    btn.classList.remove('pressed');
-    window.audio.release(0);
-}
+//#endregion

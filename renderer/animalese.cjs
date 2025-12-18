@@ -52,7 +52,7 @@ function updateTheme(theme) {
 
 window.updateVoiceLanguage = (language) => {
     preferences.set('voice_language', language);
-    window.audio.play('&.ok', { noRandom: true, channel: 2 });
+    window.audio.play('&.ok', { noRandom: true});
 }
 
 window.api.onMutedChanged((muted) => {

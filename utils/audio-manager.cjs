@@ -17,7 +17,7 @@ ipcRenderer.on('updated-voice_language', (_, value) => {
     rebuildSoundBanks();
 });
 
-const audio_path = path.join(__dirname, './assets/audio/');
+const audio_path = path.join(__dirname, './../assets/audio/');
 const file_type = ".ogg";
 
 const waitingForRelease = {};// a list of audio paths waiting for key up event to be released

@@ -1,0 +1,7 @@
+[
+    [
+        {"label":"Nothing", "btnType":"l", "sound":"#no_sound"},
+        {"label":"Disable App", "btnType":"l", "sound":"#disable_toggle"},
+        {"label":"Show Editor ", "btnType":"l", "sound":"#show_window"}
+    ]
+]

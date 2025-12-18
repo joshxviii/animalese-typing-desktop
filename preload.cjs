@@ -1,7 +1,8 @@
 const { app, shell, contextBridge, ipcRenderer } = require('electron');
-const keycodeToSound = require('./keycode-to-sound.cjs');
-const translator = require('./translator.cjs');
-const { createAudioManager } = require('./audio-manager.cjs');
+const keycodeToSound = require('./utils/keycode-to-sound.cjs');
+const translator = require('./utils/translator.cjs');
+const { fetchLayout } = require('./utils/layout.cjs');
+const { createAudioManager } = require('./utils/audio-manager.cjs');
 const { initCapsLockState, isCapsLockActive } = require('./caps-lock-state.cjs');
 initCapsLockState();
 
@@ -41,6 +42,7 @@ contextBridge.exposeInMainWorld('api', {
     closeWindow: () => ipcRenderer.send('close-window'),
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     showWindow: () => ipcRenderer.send('show-window'),
+    fetchLayout: (layoutName) => fetchLayout(layoutName),
     toggleMuted: () => ipcRenderer.send('toggle-muted'),
     getDefaultMapping: () => defaultKeyMap,
     sendRemapSound: (remapSound) => ipcRenderer.send('remap-send', remapSound),
