@@ -11,14 +11,16 @@ let layout = []; // current selected layout
  */
 function updateBoardLayout(layoutName = 'voice') {
     layout = window.api.fetchLayout(layoutName)
-    console.log('Fetched layout:', layoutName, layout);
     const layoutContainer = document.getElementById('layout_container');
     if (layoutName === 'piano') layoutContainer.innerHTML = `<piano-board></piano-board>`;
     else layoutContainer.innerHTML = `<sound-board></sound-board>`;
 }
 
 document.addEventListener('DOMContentLoaded', () => updateBoardLayout());
-window.api.onSettingUpdate('updated-voice_language', () => changeTab(1));
+window.api.onSettingUpdate('updated-voice_language', () => {
+    changeTab(1)
+    updateBoardLayout('voice');
+});
 
 customElements.define('sound-button', class extends HTMLElement {
     connectedCallback() {

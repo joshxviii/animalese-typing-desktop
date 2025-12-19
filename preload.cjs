@@ -41,7 +41,7 @@ function getKeyInfo(e) {// parse keyInfo from keyup/down event
 contextBridge.exposeInMainWorld('api', {
     closeWindow: () => ipcRenderer.send('close-window'),
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
-    showWindow: () => ipcRenderer.send('show-window'),
+    toggleWindow: () => ipcRenderer.send('toggle-visibility'),
     fetchLayout: (layoutName) => fetchLayout(layoutName),
     toggleMuted: () => ipcRenderer.send('toggle-muted'),
     getDefaultMapping: () => defaultKeyMap,

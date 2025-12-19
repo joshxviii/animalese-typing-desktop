@@ -51,6 +51,7 @@
     "settings.apps.active": "<span style='color: green'>active</span> when the selected apps are focused",
     "settings.apps.inactive": "<span style='color: red'>inactive</span> when the selected apps are focused",
     "settings.apps.description": "",
+    "settings.anchor_window":"anchor window",
     "settings.always_active":"always active",
     "settings.hold_repeat":"repeat sound while held",
     "settings.lang":"language",

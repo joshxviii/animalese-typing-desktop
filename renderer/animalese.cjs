@@ -84,7 +84,7 @@ function handleSpeicalCommand(command) {
         case '#disable_toggle': // handled in remapper
         break;
         case '#show_window':
-            window.api.showWindow();
+            window.api.toggleWindow();
         break;
     }
 }

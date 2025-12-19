@@ -1,4 +1,4 @@
-import { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain } from 'electron';
+import { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain, screen } from 'electron';
 import path from 'path';
 import Store from 'electron-store';
 import { spawn } from 'child_process';
@@ -30,13 +30,10 @@ const SYSTRAY_ICON_MUTE = (process.platform === 'darwin') ? path.join(__dirname,
 const ICON = path.join(__dirname, '/assets/images/icon.png');
 const gotTheLock = app.requestSingleInstanceLock();
 
-function toggleVisibility(visible = null) { // focus the existing window if it exists
+function toggleVisibility(setVisible = null) { // focus the existing window if it exists
     if (bgwin) {
-        if (visible === null) visible = !bgwin.isVisible();
-        if (!visible) {
-            bgwin.hide();
-            return;
-        }
+        if (setVisible === null) setVisible = !bgwin.isVisible();
+        if (!setVisible) bgwin.hide();
         else {
             bgwin.show();
             bgwin.focus();
@@ -66,6 +63,7 @@ const defaults = {
     audio_mode: 0,
     theme: 'default',
     disable_hotkey: 'F5',
+    anchor_window: true,
     startup_run: false,
     hold_repeat: true,
     always_active: true,
@@ -97,6 +95,7 @@ ipcMain.handle('store-set', async (e, key, value) => {
     preferences.set(key, value);
     bgwin.webContents.send(`updated-${key}`, value);
     if (key==='startup_run') updateTrayMenu();
+    else if(key==='anchor_window') updateWindow();
     else if (key==='disable_hotkey') updateDisableHotkey(value);
 });
 const nonResettable = [
@@ -123,8 +122,8 @@ ipcMain.handle('store-reset', async (e, key) => {// reset a certain key or all s
         });
     }
 });
-ipcMain.on('show-window', (e) => {
-    toggleVisibility(true);
+ipcMain.on('toggle-visibility', (e) => {
+    toggleVisibility();
 });
 ipcMain.on('close-window', (e) => {
     if (bgwin) bgwin.close();
@@ -149,6 +148,7 @@ ipcMain.on('get-app-info', (e) => {
 ipcMain.on('set-run-on-startup', (e, value) => setRunOnStartup(value));
 
 var bgwin = null;
+var anchored = true;
 var remapwin = null;
 var tray = null;
 let muted = false;
@@ -189,13 +189,33 @@ async function monitorFocusedWindow() {
 function startWindowMonitoring() {
     setInterval(monitorFocusedWindow, 500); // check window every .5 seconds
 }
-function createMainWin() {
+
+function updateWindow() {
+    if(bgwin !== null) {
+        anchored = preferences.get('anchor_window');
+        if(anchored) {
+            bgwin.setMovable(false);
+            bgwin.setSkipTaskbar(true);
+            bgwin.setPosition(
+                Math.round(screen.getPrimaryDisplay().workAreaSize.width - bgwin.getBounds().width - 10),
+                Math.round(screen.getPrimaryDisplay().workAreaSize.height - bgwin.getBounds().height - 10)
+            );
+        }
+        else {
+            bgwin.setMovable(true);
+            bgwin.setSkipTaskbar(false);
+        }
+    }
+}
+
+function setupMainWin() {
     if(bgwin !== null) return;
+
     bgwin = new BrowserWindow({
         width: 720,
-        height: 360,
+        height: 340,
         icon: ICON,
-        resizable: true,
+        resizable: false,
         frame: false,
         skipTaskbar: false,
         show: false,
@@ -205,15 +225,15 @@ function createMainWin() {
             nodeIntegration: false,
             sandbox: false
         }
-    });
+    })
+    
     bgwin.removeMenu();
     bgwin.loadFile('editor.html');
     bgwin.webContents.send('muted-changed', muted);
     bgwin.setAspectRatio(2);
-    bgwin.setMinimumSize(720, 360);
     
     bgwin.on('close', function (e) {
-        if (!app.isQuiting) {
+        if (!(app.isQuiting)) {
             if (process.platform === 'darwin') app.dock.hide();
             e.preventDefault();
             bgwin.hide();
@@ -225,6 +245,17 @@ function createMainWin() {
         bgwin = null;
     });
 
+    bgwin.on('blur', function () {
+        if(anchored) bgwin.hide();
+    });
+
+    bgwin.on('will-move', function () {
+        bgwin.setOpacity(0.6);
+    })
+    bgwin.on('moved', function () {
+        if(!anchored) bgwin.setOpacity(1.0);
+    });
+
     bgwin.webContents.on('before-input-event', (e, input) => {
         if (input.control && input.shift && input.key.toLowerCase() === 'i') {
             const wc = bgwin.webContents;
@@ -233,6 +264,8 @@ function createMainWin() {
             e.preventDefault();
         }
     });
+
+    updateWindow();
 }
 function createRemapWin() {
     if(remapwin !== null) {
@@ -326,7 +359,7 @@ function createTrayIcon() {
     updateTrayMenu();
 
     // On Windows, clicking shows the window, while on macOS it shows the context menu
-    if (process.platform != 'darwin') tray.on('click', () => { toggleVisibility(); });
+    if (process.platform != 'darwin') tray.on('double-click', (e) => { console.log(e); if(!bgwin.isVisible() || !anchored) toggleVisibility(); });
     tray.displayBalloon({
         title: "Animalese Typing",
         content: "Animalese Typing is Running!"
@@ -422,7 +455,7 @@ function stopKeyListener() {
 
 app.on('ready', () => {
     startWindowMonitoring();
-    createMainWin();
+    setupMainWin();
     createTrayIcon();
     if (!disabled) startKeyListener();
     if (process.platform === 'darwin') app.dock.hide();
@@ -441,7 +474,7 @@ app.on('ready', () => {
 });
 
 app.on('activate', function () {
-    if (bgwin === null) createMainWin();
+    if (bgwin === null) setupMainWin();
 });
 
 app.on('window-all-closed', function () {

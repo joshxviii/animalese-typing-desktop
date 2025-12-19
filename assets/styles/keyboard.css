@@ -1,6 +1,7 @@
 :root {
     --button-size: 16px;
     --outline-width: 10px;
+    --volume-width: 46px
 }
 
 .remap_controller[show=false] {

@@ -39,34 +39,37 @@ const controls = [
 ];
 
 let voiceProfile = null;
-let voiceProfileSlots = null;
-const profileName = document.getElementById('voice_profile_name');
+//let voiceProfileSlots = null;
+//const profileName = document.getElementById('voice_profile_name');
 const checkStartupRun = document.getElementById('check_startup_run');
 
-profileName.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/[^\p{Letter}0-9\s]/gu, '').substring(0, 12);
-    document.documentElement.style.setProperty('--label-length', e.target.value.length);
-});
+// profileName.addEventListener('input', (e) => {
+//     e.target.value = e.target.value.replace(/[^\p{Letter}0-9\s]/gu, '').substring(0, 12);
+//     document.documentElement.style.setProperty('--label-length', e.target.value.length);
+// });
 
 window.api.onSettingUpdate('updated-startup_run', (value) => checkStartupRun.checked = value );
+
 
 function initControls() {
     console.log("Initializing controls...");
     
     voiceProfile = preferences.get('voice_profile');
     noteProfile = preferences.get('note_profile');
-    voiceProfileSlots = preferences.get('saved_voice_profiles');
-    profileName.value = voiceProfileSlots[parseInt(document.getElementById('voice_profile_slot').value)]?.name || ``;
-    profileName.dispatchEvent(new Event('input', { bubbles: true }));
-    for (let i = 0; i < 5; i++) document.getElementById('voice_profile_slot').options[i].innerHTML = `${i+1}. ${(voiceProfileSlots[i+1]?.name || '')}`;
+    //voiceProfileSlots = preferences.get('saved_voice_profiles');
+    //profileName.value = voiceProfileSlots[parseInt(document.getElementById('voice_profile_slot').value)]?.name || ``;
+    //profileName.dispatchEvent(new Event('input', { bubbles: true }));
+    //for (let i = 0; i < 5; i++) document.getElementById('voice_profile_slot').options[i].innerHTML = `${i+1}. ${(voiceProfileSlots[i+1]?.name || '')}`;
 
     document.getElementById('lang_select').value = preferences.get('lang');
     checkStartupRun.checked = preferences.get('startup_run');
     document.getElementById('voice_language').value = preferences.get('voice_language') || 'english';
     document.getElementById('note_instrument').value = preferences.get('note_profile').instrument;
     document.getElementById('check_always_active').checked = preferences.get('always_active');
+    document.getElementById('check_anchor_window').checked = preferences.get('anchor_window');
     document.getElementById('check_hold_repeat').checked = preferences.get('hold_repeat');
     document.querySelectorAll('#apps_table, #apps_toggle').forEach(el => el.setAttribute('disabled', preferences.get('always_active')));
+    document.querySelectorAll('#top-bar').forEach(el => el.setAttribute('hidden', preferences.get('anchor_window')));
     document.getElementById('check_selected_active').checked = preferences.get('selected_active')
     document.querySelectorAll(`[translation='settings.apps.active'], [translation='settings.apps.inactive']`).forEach(el => el.setAttribute('translation', preferences.get('selected_active')?'settings.apps.active':'settings.apps.inactive'));
     document.getElementById('apps_tbody').setAttribute('inactive', !preferences.get('selected_active'));
@@ -203,18 +206,6 @@ function selectVoiceType(type) {
 }
 //#endregion
 
-// keep consistant aspect ratio and scales all elements on the window
-function scaleWindow() {
-    const wrapper = document.getElementById('main-win');
-    const scaleX = window.innerWidth / 720;
-    const scaleY = window.innerHeight / 360;
-    const scale = Math.min(scaleX, scaleY);
-    wrapper.style.transform = `scale(${scale*1})`;
-}
-window.addEventListener('resize', scaleWindow);
-window.addEventListener('load', scaleWindow);
-scaleWindow();
-
 //#region Focused Windows
 function updatedFocusedWindows(activeWindows = []) {
     const enabledApps = preferences.get('selected_apps');
@@ -254,49 +245,49 @@ window.api.onFocusedWindowChanged((activeWindows) => updatedFocusedWindows(activ
 
 //#region Savable voice profiles
 //TODO make a custom notification popup for alerts
-function deleteVoiceProfile() {
-    const selectedSlot = document.getElementById('voice_profile_slot').value;
+// function deleteVoiceProfile() {
+//     const selectedSlot = document.getElementById('voice_profile_slot').value;
 
-    let savedVoiceProfiles = preferences.get('saved_voice_profiles');
-    savedVoiceProfiles = new Map(Object.entries(savedVoiceProfiles));
-    savedVoiceProfiles.delete(selectedSlot);
-    const savedProfilesObject = Object.fromEntries(savedVoiceProfiles);
-    document.getElementById('voice_profile_slot').options[parseInt(selectedSlot)-1].innerHTML = `${selectedSlot}. `;
+//     let savedVoiceProfiles = preferences.get('saved_voice_profiles');
+//     savedVoiceProfiles = new Map(Object.entries(savedVoiceProfiles));
+//     savedVoiceProfiles.delete(selectedSlot);
+//     const savedProfilesObject = Object.fromEntries(savedVoiceProfiles);
+//     document.getElementById('voice_profile_slot').options[parseInt(selectedSlot)-1].innerHTML = `${selectedSlot}. `;
 
-    profileName.value = '';
-    profileName.dispatchEvent(new Event('input', { bubbles: true }));
+//     profileName.value = '';
+//     profileName.dispatchEvent(new Event('input', { bubbles: true }));
 
-    preferences.set('saved_voice_profiles', savedProfilesObject);
-}
+//     preferences.set('saved_voice_profiles', savedProfilesObject);
+// }
 
-function saveVoiceProfile() {
-    const currentVoiceProfile = preferences.get('voice_profile');
-    const selectedSlot = parseInt(document.getElementById('voice_profile_slot').value);
+// function saveVoiceProfile() {
+//     const currentVoiceProfile = preferences.get('voice_profile');
+//     const selectedSlot = parseInt(document.getElementById('voice_profile_slot').value);
     
-    if (!profileName.value) return;
+//     if (!profileName.value) return;
 
-    let savedVoiceProfiles = new Map(Object.entries(preferences.get('saved_voice_profiles')));
-    savedVoiceProfiles.set(selectedSlot, { name: profileName.value, profile: currentVoiceProfile });
-    const savedProfilesObject = Object.fromEntries(savedVoiceProfiles);
-    document.getElementById('voice_profile_slot').options[parseInt(selectedSlot)-1].innerHTML = `${selectedSlot}. ${profileName.value}`;
+//     let savedVoiceProfiles = new Map(Object.entries(preferences.get('saved_voice_profiles')));
+//     savedVoiceProfiles.set(selectedSlot, { name: profileName.value, profile: currentVoiceProfile });
+//     const savedProfilesObject = Object.fromEntries(savedVoiceProfiles);
+//     document.getElementById('voice_profile_slot').options[parseInt(selectedSlot)-1].innerHTML = `${selectedSlot}. ${profileName.value}`;
 
-    preferences.set('saved_voice_profiles', savedProfilesObject);
-}
+//     preferences.set('saved_voice_profiles', savedProfilesObject);
+// }
 
-function loadVoiceProfile() {
-    const selectedSlot = document.getElementById('voice_profile_slot').value;
-    const savedVoiceProfiles = preferences.get('saved_voice_profiles');
-    const selectedProfile = savedVoiceProfiles[selectedSlot];
+// function loadVoiceProfile() {
+//     const selectedSlot = document.getElementById('voice_profile_slot').value;
+//     const savedVoiceProfiles = preferences.get('saved_voice_profiles');
+//     const selectedProfile = savedVoiceProfiles[selectedSlot];
 
-    if (selectedProfile) {
-        profileName.value = selectedProfile.name;
-        preferences.set('voice_profile', selectedProfile.profile);
-        voiceProfile = preferences.get('voice_profile')
-        initControls();
-    } else profileName.value = '';
+//     if (selectedProfile) {
+//         profileName.value = selectedProfile.name;
+//         preferences.set('voice_profile', selectedProfile.profile);
+//         voiceProfile = preferences.get('voice_profile')
+//         initControls();
+//     } else profileName.value = '';
 
-    profileName.dispatchEvent(new Event('input', { bubbles: true }));
-}
+//     profileName.dispatchEvent(new Event('input', { bubbles: true }));
+// }
 //#endregion
 
 function openSettings() {
@@ -419,8 +410,8 @@ function changeTab(newTabIndex = 1) {
     allTabs[newTabIndex].setAttribute('pressed',true);
     if(isRemapping) allTabs[newTabIndex].classList.add('highlighted');
 
-    updateBoardLayout(allTabs[newTabIndex].id);
     if (newTabIndex === tabIndex) return;
+    updateBoardLayout(allTabs[newTabIndex].id);
 
     const allEditors = document.querySelectorAll('#bottom_row .audio_editor');
     allEditors.forEach(el => el.setAttribute('show',false));
