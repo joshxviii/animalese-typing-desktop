@@ -3,9 +3,11 @@
 #include <cstring>
 #include <string>
 #include <csignal>
+#include <vector>
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <poll.h>
 #include <linux/input.h>
 #include <libevdev/libevdev.h>
 #include <X11/Xlib.h>
@@ -89,13 +91,54 @@ bool runX11Backend() {
 //#endregion
 
 //#region Evdev Backend (Wayland/Universal)
-int evdevFd = -1;
-struct libevdev *evdevDev = nullptr;
+struct KeyboardDevice {
+    int fd;
+    struct libevdev *dev;
+    std::string path;
+    std::string name;
+};
 
-// Find keyboard device in /dev/input/
-std::string findKeyboardDevice() {
+std::vector<KeyboardDevice> keyboards;
+
+// Check if device is a real keyboard
+bool isKeyboard(struct libevdev *dev) {
+    if (!libevdev_has_event_type(dev, EV_KEY)) return false;
+    
+    // Must have letter keys (check top row Q-P)
+    int letterCount = 0;
+    for (int k = KEY_Q; k <= KEY_P; k++) {
+        if (libevdev_has_event_code(dev, EV_KEY, k)) letterCount++;
+    }
+    if (letterCount < 8) return false;
+    
+    // Must have basic keys
+    if (!libevdev_has_event_code(dev, EV_KEY, KEY_SPACE)) return false;
+    if (!libevdev_has_event_code(dev, EV_KEY, KEY_ENTER)) return false;
+        
+    // Exclude non-keyboards by name
+    const char* name = libevdev_get_name(dev);
+    if (name) {
+        std::string nameStr(name);
+        for (char &c : nameStr) c = tolower(c);
+        if (nameStr.find("power") != std::string::npos ||
+            nameStr.find("button") != std::string::npos ||
+            nameStr.find("video") != std::string::npos ||
+            nameStr.find("mouse") != std::string::npos ||
+            nameStr.find("touchpad") != std::string::npos ||
+            nameStr.find("webcam") != std::string::npos ||
+            nameStr.find("consumer") != std::string::npos) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Find all keyboard devices in /dev/input/
+std::vector<KeyboardDevice> findAllKeyboards() {
+    std::vector<KeyboardDevice> result;
     DIR *dir = opendir("/dev/input");
-    if (!dir) return "";
+    if (!dir) return result;
 
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
@@ -111,51 +154,59 @@ std::string findKeyboardDevice() {
             continue;
         }
 
-        // Check if this device has keyboard capabilities
-        bool hasKeys = libevdev_has_event_type(dev, EV_KEY) &&
-                       libevdev_has_event_code(dev, EV_KEY, KEY_A) &&
-                       libevdev_has_event_code(dev, EV_KEY, KEY_Z);
-
-        libevdev_free(dev);
-        close(fd);
-
-        if (hasKeys) {
-            closedir(dir);
-            return path;
+        if (isKeyboard(dev)) {
+            const char* devName = libevdev_get_name(dev);
+            std::string name = devName ? devName : "Unknown";
+            std::cerr << "Found keyboard: " << path << " (" << name << ")" << std::endl;
+            result.push_back({fd, dev, path, name});
+        } else {
+            libevdev_free(dev);
+            close(fd);
         }
     }
 
     closedir(dir);
-    return "";
+    return result;
 }
 
 bool runEvdevBackend() {
-    std::string devicePath = findKeyboardDevice();
-    if (devicePath.empty()) {
-        std::cerr << "No keyboard device found. Make sure you have permission to read /dev/input/" << std::endl;
+    keyboards = findAllKeyboards();
+    
+    if (keyboards.empty()) {
+        std::cerr << "No keyboard devices found. Make sure you have permission to read /dev/input/" << std::endl;
         return false;
     }
 
-    evdevFd = open(devicePath.c_str(), O_RDONLY);
-    if (evdevFd < 0) {
-        std::cerr << "Cannot open " << devicePath << ". Permission denied?" << std::endl;
-        return false;
+    std::cerr << "Listening on " << keyboards.size() << " keyboard(s)" << std::endl;
+
+    // Setup poll for all keyboards
+    std::vector<struct pollfd> fds(keyboards.size());
+    for (size_t i = 0; i < keyboards.size(); i++) {
+        fds[i].fd = keyboards[i].fd;
+        fds[i].events = POLLIN;
     }
 
-    if (libevdev_new_from_fd(evdevFd, &evdevDev) < 0) {
-        close(evdevFd);
-        return false;
-    }
-
-    // Track modifier state
+    // Track modifier state (global across all keyboards)
     bool shift = false, ctrl = false, alt = false;
 
-    struct input_event ev;
     while (running) {
-        int rc = libevdev_next_event(evdevDev, LIBEVDEV_READ_FLAG_NORMAL | LIBEVDEV_READ_FLAG_BLOCKING, &ev);
-        
-        if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
-            if (ev.type == EV_KEY) {
+        int ret = poll(fds.data(), fds.size(), 100); // 100ms timeout
+        if (ret < 0) {
+            if (errno == EINTR) continue;
+            break;
+        }
+        if (ret == 0) continue; // timeout
+
+        for (size_t i = 0; i < keyboards.size(); i++) {
+            if (!(fds[i].revents & POLLIN)) continue;
+
+            struct input_event ev;
+            int rc;
+            while ((rc = libevdev_next_event(keyboards[i].dev, 
+                    LIBEVDEV_READ_FLAG_NORMAL, &ev)) == LIBEVDEV_READ_STATUS_SUCCESS) {
+                
+                if (ev.type != EV_KEY) continue;
+
                 // Update modifier state
                 if (ev.code == KEY_LEFTSHIFT || ev.code == KEY_RIGHTSHIFT) {
                     shift = (ev.value != 0);
@@ -179,22 +230,21 @@ bool runEvdevBackend() {
                               << "}" << std::endl;
                 }
             }
-        } else if (rc == LIBEVDEV_READ_STATUS_SYNC) {
-            // Re-sync - device state changed while we weren't reading
-            while (libevdev_next_event(evdevDev, LIBEVDEV_READ_FLAG_SYNC, &ev) == LIBEVDEV_READ_STATUS_SYNC) {
-                // Process sync events
+            
+            if (rc == LIBEVDEV_READ_STATUS_SYNC) {
+                while (libevdev_next_event(keyboards[i].dev, 
+                        LIBEVDEV_READ_FLAG_SYNC, &ev) == LIBEVDEV_READ_STATUS_SYNC) {}
             }
-        } else if (rc == -EAGAIN) {
-            // No events available, continue
-            usleep(1000);
-        } else {
-            // Error
-            break;
         }
     }
 
-    libevdev_free(evdevDev);
-    close(evdevFd);
+    // Cleanup all keyboards
+    for (auto &kb : keyboards) {
+        libevdev_free(kb.dev);
+        close(kb.fd);
+    }
+    keyboards.clear();
+    
     return true;
 }
 //#endregion
@@ -205,8 +255,9 @@ void signalHandler(int) {
     if (context && dpy) {
         XRecordDisableContext(dpy, context);
     }
-    if (evdevDev) {
-        libevdev_grab(evdevDev, LIBEVDEV_UNGRAB);
+    // Cleanup keyboards on signal
+    for (auto &kb : keyboards) {
+        if (kb.dev) libevdev_grab(kb.dev, LIBEVDEV_UNGRAB);
     }
 }
 //#endregion
