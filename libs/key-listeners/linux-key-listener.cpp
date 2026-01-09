@@ -100,22 +100,22 @@ struct KeyboardDevice {
 
 std::vector<KeyboardDevice> keyboards;
 
-// Check if device is a real keyboard
+// check if device is a real keyboard
 bool isKeyboard(struct libevdev *dev) {
     if (!libevdev_has_event_type(dev, EV_KEY)) return false;
     
-    // Must have letter keys (check top row Q-P)
+    // must have letter keys (check top row Q-P)
     int letterCount = 0;
     for (int k = KEY_Q; k <= KEY_P; k++) {
         if (libevdev_has_event_code(dev, EV_KEY, k)) letterCount++;
     }
     if (letterCount < 8) return false;
     
-    // Must have basic keys
+    // must have basic keys
     if (!libevdev_has_event_code(dev, EV_KEY, KEY_SPACE)) return false;
     if (!libevdev_has_event_code(dev, EV_KEY, KEY_ENTER)) return false;
         
-    // Exclude non-keyboards by name
+    // exclude non-keyboards by name
     const char* name = libevdev_get_name(dev);
     if (name) {
         std::string nameStr(name);
@@ -134,7 +134,7 @@ bool isKeyboard(struct libevdev *dev) {
     return true;
 }
 
-// Find all keyboard devices in /dev/input/
+// find all keyboard devices in /dev/input/
 std::vector<KeyboardDevice> findAllKeyboards() {
     std::vector<KeyboardDevice> result;
     DIR *dir = opendir("/dev/input");
@@ -179,14 +179,14 @@ bool runEvdevBackend() {
 
     std::cerr << "Listening on " << keyboards.size() << " keyboard(s)" << std::endl;
 
-    // Setup poll for all keyboards
+    // setup poll for all keyboards
     std::vector<struct pollfd> fds(keyboards.size());
     for (size_t i = 0; i < keyboards.size(); i++) {
         fds[i].fd = keyboards[i].fd;
         fds[i].events = POLLIN;
     }
 
-    // Track modifier state (global across all keyboards)
+    // track modifier state (global across all keyboards)
     bool shift = false, ctrl = false, alt = false;
 
     while (running) {
@@ -207,7 +207,7 @@ bool runEvdevBackend() {
                 
                 if (ev.type != EV_KEY) continue;
 
-                // Update modifier state
+                // update modifier state
                 if (ev.code == KEY_LEFTSHIFT || ev.code == KEY_RIGHTSHIFT) {
                     shift = (ev.value != 0);
                 }
@@ -238,7 +238,7 @@ bool runEvdevBackend() {
         }
     }
 
-    // Cleanup all keyboards
+    // cleanup all keyboards
     for (auto &kb : keyboards) {
         libevdev_free(kb.dev);
         close(kb.fd);
@@ -255,7 +255,7 @@ void signalHandler(int) {
     if (context && dpy) {
         XRecordDisableContext(dpy, context);
     }
-    // Cleanup keyboards on signal
+    // cleanup keyboards on signal
     for (auto &kb : keyboards) {
         if (kb.dev) libevdev_grab(kb.dev, LIBEVDEV_UNGRAB);
     }
@@ -267,12 +267,12 @@ bool isWaylandSession() {
     const char* waylandDisplay = std::getenv("WAYLAND_DISPLAY");
     const char* xdgSessionType = std::getenv("XDG_SESSION_TYPE");
     
-    // Check if WAYLAND_DISPLAY is set
+    // check if WAYLAND_DISPLAY is set
     if (waylandDisplay && strlen(waylandDisplay) > 0) {
         return true;
     }
     
-    // Check XDG_SESSION_TYPE
+    // check XDG_SESSION_TYPE
     if (xdgSessionType && strcmp(xdgSessionType, "wayland") == 0) {
         return true;
     }
@@ -296,6 +296,7 @@ int main(int argc, char* argv[]) {
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
 
+    // parse arguments for explicit backend selection
     bool forceX11 = false;
     bool forceEvdev = false;
     for (int i = 1; i < argc; i++) {
@@ -303,37 +304,32 @@ int main(int argc, char* argv[]) {
         if (strcmp(argv[i], "--evdev") == 0 || strcmp(argv[i], "--wayland") == 0) forceEvdev = true;
     }
 
-    // Determine which backend to use
-    bool useEvdev = false;
+    // determine backend strictly (no hybrid fallback)
+    bool useEvdev;
     
     if (forceX11) {
+        std::cerr << "Backend: X11 (forced via --x11)" << std::endl;
         useEvdev = false;
     } else if (forceEvdev) {
+        std::cerr << "Backend: evdev (forced via --evdev/--wayland)" << std::endl;
+        useEvdev = true;
+    } else if (isWaylandSession()) {
+        std::cerr << "Backend: evdev (Wayland session detected)" << std::endl;
         useEvdev = true;
     } else {
-        // Auto-detect: prefer X11 on X11 sessions, evdev on Wayland
-        if (isWaylandSession()) {
-            useEvdev = true;
-        } else if (canUseX11()) {
-            useEvdev = false;
-        } else {
-            // Fallback to evdev if X11 is not available
-            useEvdev = true;
-        }
+        std::cerr << "Backend: evdev (default)" << std::endl;
+        useEvdev = true;
     }
 
-    bool success = false;
-    
+    bool success;
     if (useEvdev) {
         success = runEvdevBackend();
-        if (!success && !forceEvdev && canUseX11()) {
-            success = runX11Backend();
-        }
     } else {
         success = runX11Backend();
-        if (!success && !forceX11) {
-            success = runEvdevBackend();
-        }
+    }
+
+    if (!success) {
+        std::cerr << "Error: Failed to initialize " << (useEvdev ? "evdev" : "X11") << " backend" << std::endl;
     }
 
     return success ? 0 : 1;

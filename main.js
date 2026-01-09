@@ -1,4 +1,4 @@
-import { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain, screen } from 'electron';
+import { app, powerMonitor, Tray, globalShortcut, BrowserWindow, Menu, ipcMain, screen, dialog } from 'electron';
 import path from 'path';
 import Store from 'electron-store';
 import { spawn } from 'child_process';
@@ -435,13 +435,49 @@ async function startKeyListener() {
         }
     });
     keyListener.stderr.on('data', data => {
-        console.log(`${platform}-listener:`, data.toString());
+        const message = data.toString();
+        console.log(`${platform}-listener:`, message);
+        
+        // detect backend initialization errors on Linux
+        if (platform === 'linux' && message.toLowerCase().includes('error')) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: 'Animalese Listener Error',
+                message: 'Key listener backend failed to initialize',
+                detail: message.trim(),
+                buttons: ['OK']
+            }).then(() => {
+                app.quit();
+            });
+        }
     });
     keyListener.on('error', (err) => {
-        console.error('animalese-listener spawn error:', err && err.message ? err.message : err);
+        const errorMsg = err && err.message ? err.message : String(err);
+        console.error('animalese-listener spawn error:', errorMsg);
+        dialog.showMessageBox({
+            type: 'error',
+            title: 'Animalese Listener Error',
+            message: 'Failed to start key listener',
+            detail: errorMsg,
+            buttons: ['OK']
+        }).then(() => {
+            app.quit();
+        });
     });
     keyListener.on('exit', (code, signal) => {
         console.error('animalese-listener exited:', code, signal);
+        // only show alert if exited with error (non-zero code) and not killed by signal
+        // if (code !== 0 && code !== null && !signal) {
+        //     dialog.showMessageBox({
+        //         type: 'warning',
+        //         title: 'Animalese Listener',
+        //         message: 'Key listener stopped unexpectedly',
+        //         detail: `Exit code: ${code}`,
+        //         buttons: ['OK']
+        //     }).then(() => {
+        //         app.quit();
+        //     });
+        // }
     });
 }
 //#endregion
