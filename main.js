@@ -7,6 +7,16 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { updateElectronApp } from 'update-electron-app';
 
+// fix Wayland color management issues on Linux
+if (process.platform === 'linux') {
+    app.commandLine.appendSwitch('disable-features', 'WaylandColorManagement');
+    app.commandLine.appendSwitch('ozone-platform-hint', 'auto');
+    
+    // disable hardware acceleration to fix VA-API errors (virtual GPU) - this for virtual machines
+    // app.commandLine.appendSwitch('disable-gpu');
+    // app.commandLine.appendSwitch('disable-software-rasterizer');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
