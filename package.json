@@ -1,7 +1,7 @@
 {
   "name": "animalese-typing",
   "productName": "Animalese Typing",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Animalese Typing",
   "repository": "https://github.com/joshxviii/animalese-typing-desktop",
   "type": "module",
@@ -17,7 +17,7 @@
     "build": "electron-builder",
     "build:mac-listener": "swiftc libs/key-listeners/mac-key-listener.swift -o libs/key-listeners/animalese-listener-x64 -target x86_64-apple-macosx11.0 && swiftc libs/key-listeners/mac-key-listener.swift -o libs/key-listeners/animalese-listener-arm64 -target arm64-apple-macosx11.0 && lipo -create -output libs/key-listeners/animalese-listener libs/key-listeners/animalese-listener-x64 libs/key-listeners/animalese-listener-arm64 && chmod +x libs/key-listeners/animalese-listener",
     "build:win-listener": "g++    -o libs/key-listeners/animalese-listener.exe libs/key-listeners/win-key-listener.cpp -mwindows -static -static-libgcc -static-libstdc++",
-    "build:linux-listener": "g++    -o libs/key-listeners/animalese-listener libs/key-listeners/linux-key-listener.cpp -lX11 -lXtst && chmod +x libs/key-listeners/animalese-listener",
+    "build:linux-listener": "g++ -o libs/key-listeners/animalese-listener libs/key-listeners/linux-key-listener.cpp -lX11 -lXtst $(pkg-config --cflags --libs libevdev) && chmod +x libs/key-listeners/animalese-listener",
     "build:mac": "npm run build:mac-listener && electron-builder --mac -p never",
     "build:win": "npm run build:win-listener && electron-builder --win -p never",
     "build:linux": "npm run build:linux-listener && electron-builder --linux -p never"
@@ -103,7 +103,7 @@
     "update-electron-app": "^3.1.2"
   },
   "devDependencies": {
-    "electron": "^36.2.1",
+    "electron": "^39.2.7",
     "electron-builder": "~24.13.3",
     "electron-rebuild": "^3.2.9"
   },
