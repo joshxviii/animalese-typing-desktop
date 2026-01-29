@@ -94,7 +94,10 @@ ipcMain.on('get-store-data-sync', (e) => {
 ipcMain.handle('store-set', async (e, key, value) => {
     preferences.set(key, value);
     bgwin.webContents.send(`updated-${key}`, value);
-    if (key==='startup_run') updateTrayMenu();
+    if (key==='startup_run') {
+        setRunOnStartup(value);
+        updateTrayMenu();
+    }
     else if(key==='anchor_window') updateWindow();
     else if (key==='disable_hotkey') updateDisableHotkey(value);
 });
@@ -145,7 +148,6 @@ ipcMain.on('get-app-info', (e) => {
         platform: process.platform
     }
 });
-ipcMain.on('set-run-on-startup', (e, value) => setRunOnStartup(value));
 
 var bgwin = null;
 var anchored = true;
@@ -327,15 +329,7 @@ function updateTrayMenu() {
             type: 'checkbox',
             checked: preferences.get('startup_run'),
             click: (menuItem) => {
-                const value = menuItem.checked;    
-                const settings = {
-                    openAtLogin: value,
-                    openAsHidden: true,
-                };
-                if (process.platform === 'win32') settings.path = app.isPackaged ? app.getPath('exe') : process.execPath;
-                preferences.set('startup_run', value);
-                bgwin.webContents.send(`updated-startup_run`, value);
-                app.setLoginItemSettings(settings);
+                setRunOnStartup(menuItem.checked);
             }
         },
         { type: 'separator' },
@@ -378,6 +372,18 @@ function toggleMuted() {
     setDisable();
     updateTrayMenu();
     if (bgwin) bgwin.webContents.send('muted-changed', muted);
+}
+
+// set app to run on startup
+function setRunOnStartup(value) {
+    const settings = {
+        openAtLogin: value,
+        openAsHidden: true,
+    };
+    if (process.platform === 'win32') settings.path = app.isPackaged ? app.getPath('exe') : process.execPath;
+    preferences.set('startup_run', value);
+    bgwin.webContents.send(`updated-startup_run`, value);
+    app.setLoginItemSettings(settings);
 }
 
 //#region KeyListener
