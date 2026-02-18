@@ -4,6 +4,7 @@
 
     "volume":"볼륨",
 
+    "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> 앱이 비활성화되어 있습니다 </span>",
     "warning.disabled":"<span style='color: var(--input-highlight-color-3);'> '<span id='hotkey'></span>'을 눌러 활성화 </span>",
     "warning.enabled":" ",
 

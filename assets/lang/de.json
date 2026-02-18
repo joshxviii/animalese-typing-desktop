@@ -4,6 +4,7 @@
     
     "volume":"Lautstärke",
 
+    "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> app ist deaktiviert </span>",
     "warning.disabled":"<span style='color: var(--input-highlight-color-3);'> drücke '<span id='hotkey'></span>' zum aktivieren </span>",
     "warning.enabled":" ",
 

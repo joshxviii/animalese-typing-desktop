@@ -4,6 +4,7 @@
 
     "volume":"音量",
      
+    "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> アプリは無効化されています </span>",
     "warning.disabled":"<span style='color: var(--input-highlight-color-3);'> '<span id='hotkey'></span>' を押して有効化 </span>",
     "warning.enabled":" ",
 

@@ -95,9 +95,9 @@ div[show=false], div[show=false] text {
     -webkit-app-region: no-drag;
     background-color: var(--accent-color);
 }
-#title {
+#title-bar #disable_app_button[icon="start"]  {
+    --alt1-color: var(--input-highlight-color-3);
 }
-
 .separator {
     width: 95%;
     height: 0px;

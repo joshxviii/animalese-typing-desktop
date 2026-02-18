@@ -4,6 +4,7 @@
 
     "volume":"Volume",
 
+    "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> app est désactivée </span>",
     "warning.disabled":"<span style='color: var(--input-highlight-color-3);'> appuyez sur '<span id='hotkey'></span>' pour activer </span>",
     "warning.enabled":" ",
 

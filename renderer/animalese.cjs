@@ -55,6 +55,11 @@ window.updateVoiceLanguage = (language) => {
     window.audio.play('&.ok', { noRandom: true});
 }
 
+function getKeyAsHotkey(keyInfo) {
+    const { key, isShiftDown, isCtrlDown, isAltDown } = keyInfo;
+    return (isCtrlDown?'CommandOrControl+':'') + (isAltDown?'Alt+':'') + (isShiftDown?'Shift+':'') + key;
+}
+
 window.api.onMutedChanged((muted) => {
     const disableButton = document.getElementById('disable_app_button');
     if (disableButton) {
@@ -62,18 +67,18 @@ window.api.onMutedChanged((muted) => {
         disableButton.setAttribute('icon', muted ? 'start' : 'stop');
         disableButton.setAttribute('title', muted ? 'Enable app' : 'Disable app');
     }
+    const hotkeyText = preferences.get('disable_hotkey');
     const warning = document.getElementById('disabled_warning');
-    warning.setAttribute('translation', muted ? 'warning.disabled' : 'warning.enabled');
-    setTimeout(() => {
-        const hotkeySpan = document.getElementById('hotkey');
-        if (hotkeySpan) hotkeySpan.innerHTML = `${preferences.get('disable_hotkey')}`.toUpperCase();
-    }, 0);
+    warning.setAttribute('translation', muted ? (hotkeyText ? 'warning.disabled' : 'warning.disabled_no_hotkey') : 'warning.enabled');
+    if (hotkeyText) setTimeout(() => updateHotkeySpan(hotkeyText), 0);
 });
 
-window.api.onSettingUpdate('updated-disable_hotkey', () => {
+window.api.onSettingUpdate('updated-disable_hotkey', () => updateHotkeySpan());
+
+function updateHotkeySpan(hotkeyText = preferences.get('disable_hotkey')) {
     const hotkeySpan = document.getElementById('hotkey');
-    if (hotkeySpan) hotkeySpan.innerHTML = `${preferences.get('disable_hotkey')}`.toUpperCase();
-});
+    if (hotkeySpan) hotkeySpan.innerHTML = `${hotkeyText}`.toUpperCase();
+}
 
 //#endregion
 
@@ -92,7 +97,11 @@ function handleSpeicalCommand(command) {
 //#region Key press detect
 window.api.onKeyDown( (keyInfo) => {
     const { keycode, isCapsLock, isShiftDown, finalSound } = keyInfo;
-    
+
+    const keyAsHotkey = getKeyAsHotkey(keyInfo);
+    const isHotkey = preferences.get('disable_hotkey') === keyAsHotkey;
+    if (isHotkey) return;// if this key is used to disable the app, do not play anything
+
     if (finalSound === undefined || finalSound === '') return;
     const isSpecial = finalSound.startsWith('#');
     const isVoice = finalSound.startsWith('&');

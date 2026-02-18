@@ -4,6 +4,7 @@
     
     "volume":"Volume",
 
+    "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> app is disabled </span>",
     "warning.disabled":"<span style='color: var(--input-highlight-color-3);'> press '<span id='hotkey'></span>' to enable </span>",
     "warning.enabled":" ",
 

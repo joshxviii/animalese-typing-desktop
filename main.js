@@ -58,8 +58,8 @@ function setDisable(value = true) {
         tray.setToolTip(muted?'Animalese Typing: Disabled':'Animalese Typing');
     }
     if (disabled === value) return;
+    if (value) stopKeyListener(); else startKeyListener();
     disabled = value;
-    if (disabled) stopKeyListener(); else startKeyListener();
 }
 
 if (!gotTheLock) app.quit(); // if another instance is already running then quit
@@ -72,7 +72,7 @@ const defaults = {
     volume: 0.5,
     audio_mode: 0,
     theme: 'default',
-    disable_hotkey: 'F5',
+    disable_hotkey: null,
     anchor_window: true,
     startup_run: false,
     hold_repeat: true,
@@ -310,7 +310,7 @@ function createRemapWin() {
         if (input.control && input.shift && input.key.toLowerCase() === 'i') {
             const wc = remapwin.webContents;
             if (wc.isDevToolsOpened()) wc.closeDevTools();
-            else  wc.openDevTools({ mode: 'detach' });
+            else wc.openDevTools({ mode: 'detach' });
             e.preventDefault();
         }
     });
@@ -371,14 +371,15 @@ function createTrayIcon() {
 
 function updateDisableHotkey(hotkey) {
     globalShortcut.unregisterAll();
-    globalShortcut.register(hotkey, () => {// TODO: give warning to renderer when hotkey registration fails
+    if(hotkey !== null) globalShortcut.register(hotkey, () => {// TODO: give warning to renderer when hotkey registration fails
         toggleMuted();
     });
+    updateTrayMenu()
 }
 
 function toggleMuted() {
     muted = !muted;
-    setDisable();
+    setDisable(muted);
     updateTrayMenu();
     if (bgwin) bgwin.webContents.send('muted-changed', muted);
 }

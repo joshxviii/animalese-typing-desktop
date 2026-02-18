@@ -195,6 +195,7 @@ function createAudioManager() {
 
     // main audio playback function
     function playSound(path, {volume=1, pitchShift=0, pitchVariation=0, intonation=0, note=60, channel=undefined, hold=undefined, noRandom=false, yelling=false} = {}) {
+        console.log(path)
         if (!path || path === '') return;
         if (waitingForRelease[hold]) return;
 

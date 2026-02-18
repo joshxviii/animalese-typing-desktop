@@ -338,7 +338,7 @@ window.api.onRemapSound((remapSound) => {
     const { key, keycode, isCtrlDown, isAltDown, isShiftDown, finalSound, defaultSound } = currentKey;
     const reset = remapSound === defaultSound;// if the key is being mapped to it's default sound, reset and clear the mapping in settings
 
-    const keyAsHotkey = (isCtrlDown?'CommandOrControl+':'') + (isAltDown?'Alt+':'') + (isShiftDown?'Shift+':'') + key;
+    const keyAsHotkey = getKeyAsHotkey(currentKey);
     const currentHotkey = preferences.get('disable_hotkey');
     const isHotkey = currentHotkey === keyAsHotkey;
 
@@ -350,6 +350,10 @@ window.api.onRemapSound((remapSound) => {
     if (remapSound === '#disable_toggle') {
         preferences.set('disable_hotkey', keyAsHotkey);
         return;// Do not save hotkey in remapped_keys. Instead, save it as disable_hotkey.
+    }
+    else if (remapSound === '#no_sound' && isHotkey) {
+        preferences.reset('disable_hotkey');
+        return;// Completely remove hotkey
     }
     
     const remappedKeys = new Map(Object.entries(preferences.get('remapped_keys')));
@@ -377,7 +381,7 @@ function remapStart() {
     
     document.querySelector('.highlighted')?.classList.remove('highlighted');
     
-    const keyAsHotkey = (isCtrlDown?'CommandOrControl+':'') + (isAltDown?'Alt+':'') + (isShiftDown?'Shift+':'') + key;
+    const keyAsHotkey = getKeyAsHotkey(currentKey);
     const currentHotkey = preferences.get('disable_hotkey');
     const isHotkey = currentHotkey === keyAsHotkey;
 
