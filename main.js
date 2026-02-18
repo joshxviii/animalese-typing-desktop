@@ -262,7 +262,7 @@ function setupMainWin() {
     });
 
     bgwin.on('will-move', function () {
-        bgwin.setOpacity(0.6);
+        if(!anchored) bgwin.setOpacity(0.6);
     })
     bgwin.on('moved', function () {
         if(!anchored) bgwin.setOpacity(1.0);
@@ -362,8 +362,7 @@ function createTrayIcon() {
 
     updateTrayMenu();
 
-    // On Windows, clicking shows the window, while on macOS it shows the context menu
-    if (process.platform != 'darwin') tray.on('double-click', (e) => { console.log(e); if(!bgwin.isVisible() || !anchored) toggleVisibility(); });
+    if (process.platform != 'darwin') tray.on('click', () => { if(!bgwin.isVisible() || !anchored) toggleVisibility(); });
     tray.displayBalloon({
         title: "Animalese Typing",
         content: "Animalese Typing is Running!"

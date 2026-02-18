@@ -69,7 +69,7 @@ function initControls() {
     document.getElementById('check_anchor_window').checked = preferences.get('anchor_window');
     document.getElementById('check_hold_repeat').checked = preferences.get('hold_repeat');
     document.querySelectorAll('#apps_table, #apps_toggle').forEach(el => el.setAttribute('disabled', preferences.get('always_active')));
-    document.querySelectorAll('#top-bar').forEach(el => el.setAttribute('hidden', preferences.get('anchor_window')));
+    document.querySelectorAll('#title-bar .window_controls').forEach(el => el.setAttribute('hidden', preferences.get('anchor_window')));
     document.getElementById('check_selected_active').checked = preferences.get('selected_active')
     document.querySelectorAll(`[translation='settings.apps.active'], [translation='settings.apps.inactive']`).forEach(el => el.setAttribute('translation', preferences.get('selected_active')?'settings.apps.active':'settings.apps.inactive'));
     document.getElementById('apps_tbody').setAttribute('inactive', !preferences.get('selected_active'));

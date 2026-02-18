@@ -47,7 +47,7 @@
     "settings.audio.mode.3":"sfx only",
     "settings.audio.mode.4":"randomized <span style='opacity: .6; font-size: 10px; margin: 3px 6px;'>(disguise typing)</span>",
     "settings.apps":"when active",
-    "settings.apps.mode": "list mode <span style='opacity: .6; font-size: 10px; margin: 3px 6px;'>allow/deny toggle</span>",
+    "settings.apps.mode": "allow/deny toggle",
     "settings.apps.active": "<span style='color: green'>active</span> when the selected apps are focused",
     "settings.apps.inactive": "<span style='color: red'>inactive</span> when the selected apps are focused",
     "settings.apps.description": "",

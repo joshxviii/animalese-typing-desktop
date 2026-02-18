@@ -77,7 +77,7 @@ const keyDefinitions = [
   { keycodes: [188, 43, 59], key: ',', sound: 'sfx.default', shiftSound: 'sfx.default' },
   { keycodes: [190, 47, 60], key: '.', sound: 'sfx.default', shiftSound: 'sfx.default' },
   { keycodes: [13, 36, 36], key: 'Enter', sound: 'sfx.enter' },
-  { keycodes: [8, 51, 22], key: 'Backspace', sound: 'sfx.backspace' },
+  { keycodes: [8, 51, 22], key: 'Backspace', sound: 'sfx.backspace', ctrlSound: 'sfx.at' },
   { keycodes: [32, 49, 65], key: 'Space'},
   // Navigation Keys
   { keycodes: [45, null, 118], key: 'Insert'},

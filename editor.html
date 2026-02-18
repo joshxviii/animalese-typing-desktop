@@ -14,7 +14,7 @@ author: joshxviii
 <body>
     <div id="">
         <div id="resize-border"></div>
-        <div class="title-bar">
+        <div id="title-bar">
             <div style="display: flex; gap: 10px;">
                 <!-- <img id="icon" src="assets\images\icon.png" alt="Animalese Typing - Desktop" title="Animalese Typing - Desktop" style="height: 20px;"></img> -->
                 <div id="title" title="Animalese Typing - Desktop">animalese typing</div>
@@ -64,7 +64,7 @@ author: joshxviii
             <div class="catagory">
                 
                 <label translation="settings.anchor_window">
-                    <input type="checkbox" id="check_anchor_window" onchange="window.settings.set('anchor_window', this.checked);document.querySelectorAll('#top-bar').forEach(el => el.setAttribute('hidden', this.checked));"/>
+                    <input type="checkbox" id="check_anchor_window" onchange="window.settings.set('anchor_window', this.checked);document.querySelectorAll('#title-bar .window_controls').forEach(el => el.setAttribute('hidden', this.checked));"/>
                 </label>
 
                 <label translation="settings.startup">
