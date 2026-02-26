@@ -557,6 +557,23 @@ input[type=text]::placeholder {
     width: 89%;
 }
 
+#note_editor {
+    border: var(--secondary-bg-color) solid 2px;
+    border-radius: 9px;
+    width: 85%;
+    padding: 6px;
+    height: 78px;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+
+#note_instrument {
+    margin-inline: revert;
+    margin-right: 8px;
+    width: 234px;
+}
+
 #sliders {
     border: var(--secondary-bg-color) solid 2px;
     padding: 4px;
@@ -566,6 +583,7 @@ input[type=text]::placeholder {
     flex-direction: column;
     gap: 8px;
 } 
+
 
 #slider_group {
     display: flex;
@@ -874,7 +892,7 @@ table thead {
 }
 
 .audio_editor {
-    padding: 0px 18px;
+    margin: 0px 18px;
     position: absolute;
 }
 
@@ -886,9 +904,5 @@ table thead {
     background: rgb(from var(--input-bg-color) r g b / 1.0);
 }  
 #remap-table {
-    height: 90%;
-}
-#remap-table td {
-    width: 43%;
-    padding-block: 6px;
+    display: table;
 }

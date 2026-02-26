@@ -2,6 +2,10 @@
     "footer":"동물의 숲 라이프스타일",
     "description":"타이핑할 때마다 동물의 숲 주민의 목소리가 재생됩니다!",
 
+    "bindings.title":"key bindings",
+    "bindings.c1":"key combo",
+    "bindings.c2":"sound id",
+
     "volume":"볼륨",
 
     "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> 앱이 비활성화되어 있습니다 </span>",

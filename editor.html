@@ -236,7 +236,7 @@ author: joshxviii
                         </div> -->
                     </div>
                     <!-- NOTES -->
-                    <div class="audio_editor" show="false">
+                    <div class="audio_editor" id="note_editor" show="false">
                         <label class="editor_label" style="display: flex;" translation="note.instrument">
                             <select id="note_instrument">
                                 <option value="girl"       translation="girl">girl</option>
@@ -250,7 +250,6 @@ author: joshxviii
                                 <option value="whistle"    translation="whistle">whistle</option>
                             </select>
                         </label>
-                        <br/>
                         <label class="editor_label" style="display: flex;" translation="note.transpose">
                             <input id="note_transpose" class="editor_slider" type="range" min="-12" max="12" step="1" value="0" defaultValue="0"></input>
                             <input type="text" id="note_transpose_out" class="editor_output" display="int" />

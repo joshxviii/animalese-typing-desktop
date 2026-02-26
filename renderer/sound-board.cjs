@@ -133,7 +133,6 @@ customElements.define('piano-board', class extends HTMLElement {
         back.appendTo(this);
         keys.appendTo(this);
 
-        // auto scroll keys when near the edges
         const piano_keys = document.getElementById('piano_keys');
         let scrollDirection = 0;
         let animationFrameId = null;

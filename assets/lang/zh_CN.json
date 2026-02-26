@@ -2,6 +2,10 @@
     "footer":"《动物森友会》生活方式",
     "description":"每次输入时都会播放《动物森友会》的声音！",
     
+    "bindings.title":"key bindings",
+    "bindings.c1":"key combo",
+    "bindings.c2":"sound id",
+
     "volume":"音量",
 
     "warning.disabled_no_hotkey":"<span style='color: var(--input-highlight-color-3);'> app 已禁用 </span>",

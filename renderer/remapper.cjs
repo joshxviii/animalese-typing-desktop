@@ -74,7 +74,7 @@ function renderSoundToKeysTable(mapping) {
                             : c.combo.toUpperCase()
                     ).join('<br>')}
             </td>
-            <td>${sound}</td>
+            <td>${sound.replace('%', 'note').replace('&', 'voice')}</td>
         `;
         tbody.appendChild(tr);
     });

@@ -99,8 +99,7 @@ window.api.onKeyDown( (keyInfo) => {
     const { keycode, isCapsLock, isShiftDown, finalSound } = keyInfo;
 
     const keyAsHotkey = getKeyAsHotkey(keyInfo);
-    const isHotkey = preferences.get('disable_hotkey') === keyAsHotkey;
-    if (isHotkey) return;// if this key is used to disable the app, do not play anything
+    if (preferences.get('disable_hotkey') === keyAsHotkey) return;// if this key is used to disable the app, do not play anything
 
     if (finalSound === undefined || finalSound === '') return;
     const isSpecial = finalSound.startsWith('#');
