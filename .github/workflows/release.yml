@@ -75,8 +75,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install X11 dependencies (for Linux key listener)
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxtst-dev
+      - name: Install X11 and Wayland dependencies (for Linux key listener)
+        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxtst-dev libevdev-dev
 
       - name: Install dependencies
         run: npm ci
