@@ -16,9 +16,13 @@ If you are using a Mac, there is a simple way to determine what version of this 
 
 At the very top left of your screen, there is an Apple logo. When you press it, a menu will appear.
 
+![Mac About Menu](./assets/docs/mac-menu.png)
+
 Press the "About This Mac", or whichever button says something similar. Apple may have changed the words used to describe the menu option, but if the words "About" and "Mac" are on the same line, that is the one you want to select.
 
 A popup will appear in middle of your screen. If you read the contents of it carefully, you will see a piece of text describing what "Chip" your computer has. Pay attention to the words described in that area, as it tells you which link to press on the [Releases](https://github.com/joshxviii/animalese-typing-desktop/releases/latest) page.
+
+![About Mac Window](./assets/docs/about-this-mac.png)
 
 Now that you have confirmed what kind of chip your mac you has, pay attention to the section on Releases that says "Assets". That section just means "things you can download".
 
