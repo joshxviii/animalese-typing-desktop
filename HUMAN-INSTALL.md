@@ -2,7 +2,7 @@
 
 Installation of the Animalese Desktop Application depends on what kind of computer you have.
 
-If you are a "normal person", and not a software developer, you should follow the these instructions.
+If you are a "normal person", and not a software developer, you should follow these instructions.
 
 If you are a software developer, chances are you didn't need to read this, and you ignored this page completely.
 
