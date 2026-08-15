@@ -33,6 +33,8 @@
 
 ![DemoImage](https://github.com/user-attachments/assets/ccea8ea8-359c-4a2d-84d2-f9b3ebf97d29)
 
+***IF YOU ARE CONFUSED***, read [this page](./HUMAN-INSTALL.md).
+
 ## Planned Features:
 - **Get the app signed/notarized** - This makes sure the app is recognized as trustworthy for smoother installation
 - **Uploading Custom Audio Files**
