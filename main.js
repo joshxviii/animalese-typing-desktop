@@ -110,6 +110,7 @@ ipcMain.handle('store-set', async (e, key, value) => {
     }
     else if(key==='anchor_window') updateWindow();
     else if (key==='disable_hotkey') updateDisableHotkey(value);
+    handlePreferenceSideEffects(key);
 });
 const nonResettable = [
     'lang',
@@ -122,6 +123,7 @@ ipcMain.handle('store-reset', async (e, key) => {// reset a certain key or all s
         preferences.set(key, defaults[key]);
         bgwin.webContents.send(`updated-${key}`, defaults[key]);
         if (key==='disable_hotkey') updateDisableHotkey(defaults[key]);
+        handlePreferenceSideEffects(key);
     }
     else {// reset all
         Object.keys(preferences.store).forEach(key => { if (!nonResettable.includes(key)) preferences.delete(key); });
@@ -133,6 +135,7 @@ ipcMain.handle('store-reset', async (e, key) => {// reset a certain key or all s
                 if (key==='disable_hotkey') updateDisableHotkey(defaults[key]);
             }
         });
+        updateWindowMonitoring({ force: true });
     }
 });
 ipcMain.on('toggle-visibility', (e) => {
@@ -167,21 +170,75 @@ let muted = false;
 var disabled = muted || !preferences.get('always_active');
 let lastFocusedWindow = null;
 let focusedWindows = [];
+let windowMonitoringTimer = null;
+let focusedWindowCheckInFlight = false;
+
+function shouldMonitorFocusedWindow() {
+    // Selected-app mode must keep polling even while disabled by focus so it can detect return.
+    return Boolean(getFocusedWindow) && !muted && !preferences.get('always_active');
+}
+
+function stopWindowMonitoring({ resetFocus = false } = {}) {
+    if (windowMonitoringTimer) {
+        clearInterval(windowMonitoringTimer);
+        windowMonitoringTimer = null;
+    }
+    if (resetFocus) lastFocusedWindow = null;
+}
+
+function startWindowMonitoring({ force = false } = {}) {
+    if (!shouldMonitorFocusedWindow()) {
+        stopWindowMonitoring({ resetFocus: force });
+        return;
+    }
+
+    if (!windowMonitoringTimer) windowMonitoringTimer = setInterval(monitorFocusedWindow, 500);
+
+    if (force) {
+        lastFocusedWindow = null;
+        monitorFocusedWindow();
+    }
+}
+
+function updateWindowMonitoring({ force = false } = {}) {
+    if (muted) {
+        stopWindowMonitoring({ resetFocus: true });
+        setDisable(true);
+        return;
+    }
+
+    if (preferences.get('always_active')) {
+        stopWindowMonitoring({ resetFocus: true });
+        setDisable(false);
+        return;
+    }
+
+    setDisable(true);
+    // Stay conservative until the async focus check proves the current app is allowed.
+    startWindowMonitoring({ force });
+}
+
+function handlePreferenceSideEffects(key) {
+    if (['always_active', 'selected_apps', 'selected_active'].includes(key)) {
+        updateWindowMonitoring({ force: true });
+    }
+}
 
 // check for active window changes and update `lastFocusedWindow` when the window changes
 async function monitorFocusedWindow() {
-    // Skip window monitoring on Linux or if getFocusedWindow is not available
-    if (!getFocusedWindow) return;
+    if (!shouldMonitorFocusedWindow() || focusedWindowCheckInFlight) return;
     
+    focusedWindowCheckInFlight = true;
     try {
         const focusedWindow = await getFocusedWindow();
+        if (!shouldMonitorFocusedWindow()) return;
 
         if (!focusedWindow?.owner?.name) return;// return early if invalid window
 
         const winName = focusedWindow.owner.name
         if (winName === lastFocusedWindow?.owner?.name) return;// return early if the active window hasn't changed.
         
-        const selectedApps = preferences.get('selected_apps');
+        const selectedApps = preferences.get('selected_apps') || [];
 
         // change disable value when focusing in or out of selected-apps.
         setDisable( (preferences.get('selected_active')?!selectedApps.includes(winName):selectedApps.includes(winName)) && 
@@ -191,15 +248,13 @@ async function monitorFocusedWindow() {
         if (!focusedWindows.includes(winName)) {
             focusedWindows.push(winName);
             if (focusedWindows.length > 8) focusedWindows.shift();
-            bgwin.webContents.send('focused-window-changed', focusedWindows);
+            bgwin?.webContents?.send('focused-window-changed', focusedWindows);
         }
     } catch (error) {
         console.debug('Window monitoring error:', error.message);
+    } finally {
+        focusedWindowCheckInFlight = false;
     }
-}
-
-function startWindowMonitoring() {
-    setInterval(monitorFocusedWindow, 500); // check window every .5 seconds
 }
 
 function updateWindow() {
@@ -324,9 +379,7 @@ function updateTrayMenu() {
             accelerator: preferences.get('disable_hotkey'),
             checked: muted,
             click: (menuItem) => { 
-                muted = menuItem.checked;
-                setDisable();
-                if (bgwin) bgwin.webContents.send('muted-changed', muted);
+                setMuted(menuItem.checked);
             }
         },
         {
@@ -378,8 +431,12 @@ function updateDisableHotkey(hotkey) {
 }
 
 function toggleMuted() {
-    muted = !muted;
-    setDisable(muted);
+    setMuted(!muted);
+}
+
+function setMuted(value) {
+    muted = value;
+    updateWindowMonitoring({ force: true });
     updateTrayMenu();
     if (bgwin) bgwin.webContents.send('muted-changed', muted);
 }
@@ -400,6 +457,8 @@ function setRunOnStartup(value) {
 let keyListener;
 
 async function startKeyListener() {
+    if (keyListener) return;
+
     const platform = process.platform;
     let listenerPath;
 
@@ -426,8 +485,9 @@ async function startKeyListener() {
     }
 
     //if (!keyListener) return;
-    keyListener = spawn(listenerPath);
-    keyListener.stdout.on('data', data => {
+    const listener = spawn(listenerPath);
+    keyListener = listener;
+    listener.stdout.on('data', data => {
         const lines = data.toString().split('\n').filter(Boolean);
 
         for (const line of lines) {
@@ -450,7 +510,7 @@ async function startKeyListener() {
             }
         }
     });
-    keyListener.stderr.on('data', data => {
+    listener.stderr.on('data', data => {
         const message = data.toString();
         console.log(`${platform}-listener:`, message);
         
@@ -467,7 +527,7 @@ async function startKeyListener() {
             });
         }
     });
-    keyListener.on('error', (err) => {
+    listener.on('error', (err) => {
         const errorMsg = err && err.message ? err.message : String(err);
         console.error('animalese-listener spawn error:', errorMsg);
         dialog.showMessageBox({
@@ -480,8 +540,9 @@ async function startKeyListener() {
             app.quit();
         });
     });
-    keyListener.on('exit', (code, signal) => {
+    listener.on('exit', (code, signal) => {
         console.error('animalese-listener exited:', code, signal);
+        if (keyListener === listener) keyListener = null;
         // only show alert if exited with error (non-zero code) and not killed by signal
         // if (code !== 0 && code !== null && !signal) {
         //     dialog.showMessageBox({
@@ -506,9 +567,9 @@ function stopKeyListener() {
 }
 
 app.on('ready', () => {
-    startWindowMonitoring();
     setupMainWin();
     createTrayIcon();
+    updateWindowMonitoring({ force: true });
     if (!disabled) startKeyListener();
     if (process.platform === 'darwin') app.dock.hide();
     bgwin.hide();
@@ -519,6 +580,7 @@ app.on('ready', () => {
     });
     powerMonitor.on('resume', () => {
         if (!disabled) startKeyListener();
+        updateWindowMonitoring({ force: true });
     });
 
     updateDisableHotkey(preferences.get('disable_hotkey'));
@@ -534,6 +596,7 @@ app.on('window-all-closed', function () {
 });
 
 app.on('before-quit', () => {
+    stopWindowMonitoring({ resetFocus: true });
     stopKeyListener();
     if (keyListener) {
         keyListener.kill('SIGKILL');

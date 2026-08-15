@@ -22,6 +22,7 @@ const file_type = ".ogg";
 
 const waitingForRelease = {};// a list of audio paths waiting for key up event to be released
 const activeChannels = {};// map of currently playing sounds on a given channel (only one sound per channel)
+const INTONATION_EPSILON = 1e-6;
 
 //#region Audio Sprite Maps
 // (60,000/2) / 150bpm = 200ms
@@ -153,7 +154,10 @@ function releaseSound(release_id, cut = true) {
 }
 
 function applyIntonation(bank, id, intonation, currentRate = 1, ramp = 2) {
-const duration = 3200; // ms duration for ramp
+    // Neutral intonation is an audible no-op, so avoid scheduling a 64-step timer ramp.
+    if (!Number.isFinite(intonation) || Math.abs(intonation) <= INTONATION_EPSILON) return [];
+
+    const duration = 3200; // ms duration for ramp
     const startRate = Math.max(currentRate, 0.01);
     const endRate = startRate * (
         intonation >= 0
@@ -162,6 +166,7 @@ const duration = 3200; // ms duration for ramp
     );
     const steps = 64;
     const interval = duration / steps;
+    const timers = [];
 
     for (let i = 1; i <= steps; i++) {
         const t = i / steps;
@@ -173,14 +178,25 @@ const duration = 3200; // ms duration for ramp
     
         const rate = startRate * ((endRate / startRate) ** easedT);
 
-        setTimeout(() => bank.rate(rate, id), i * interval);
+        timers.push(setTimeout(() => {
+            if (bank.playing(id)) bank.rate(rate, id);
+        }, i * interval));
     }
+
+    return timers;
+}
+
+function clearAudioTimers(audio) {
+    if (!audio?.intonationTimers) return;
+    for (const timer of audio.intonationTimers) clearTimeout(timer);
+    audio.intonationTimers = [];
 }
 
 // audio channel cutoff logic
 function cutOffAudio(audio, release=0.025) {
-    CUTOFF_DURATION=release;
+    const CUTOFF_DURATION=release;
     const prev = audio;
+    clearAudioTimers(prev);
     if (!prev || !prev.bank.playing(prev.id)) return;
 
     prev.bank.fade(prev.bank.volume(prev.id), 0, CUTOFF_DURATION * 1000, prev.id);
@@ -299,10 +315,11 @@ function createAudioManager() {
         bank.rate(rate, id);
         
         // apply intonation
-        if (intonation !== undefined) applyIntonation(bank, id, intonation, bank.rate(id));
+        const intonationTimers = intonation !== undefined ? applyIntonation(bank, id, intonation, bank.rate(id)) : [];
+        const audioHandle = { bank, id, intonationTimers };
         // add this sound to a cutoff channel
-        if (channel !== undefined) activeChannels[channel] = { bank, id };
-        if (hold !== undefined) waitingForRelease[hold] = { bank, id };
+        if (channel !== undefined) activeChannels[channel] = audioHandle;
+        if (hold !== undefined) waitingForRelease[hold] = audioHandle;
     }
     return { play: playSound, release: releaseSound };
 }
