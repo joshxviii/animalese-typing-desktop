@@ -84,7 +84,7 @@
         "--no-sandbox"
       ],
       "category": "Utility",
-      "icon": "assets/images/icon.png",
+      "icon": "assets/images/linux-icons",
       "extraResources": [
         {
           "from": "libs/key-listeners/animalese-listener",
